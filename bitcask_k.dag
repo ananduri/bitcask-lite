@@ -46,3 +46,119 @@ size_t and ssize_t?)
   (Gets closer to achieving avalanche)
   (Rotating hash, which does this, is minimal acceptable hash function))
 )
+
+
+(What do the numbers in 32-bit system, 64-bit system mean?
+ 
+ (The size of the data bus.
+  How many bits can be transferred/loaded 
+  in one memory operation.))
+
+
+(What is NULL in C?
+ 
+ (It's a macro
+  assigned to pointers
+  to point them to nothing)
+ 
+ (eg
+  int* p = NULL;)
+ 
+ (Cannot dereference them.))
+
+
+(What is '->' in C?
+ 
+ (;Context
+  (Need to reference members of structs)
+  
+  (Do that with '.' notation)
+  
+  (;eg
+   struct Node n;
+   n.value = 1;)
+  
+  (But if have pointer to the struct,
+   need to do
+   struct Node* p;
+   (*p).value = 1;))
+ 
+ (;Used for
+  (Reference members of struct
+   directly from pointer to struct)
+  
+  (;eg
+   struct Node* p;
+   p->value = 1;))
+ 
+ (;properties
+  (p->member
+   ;equiv
+   (*p).member)))
+
+
+(What is `static` in C?
+ 
+ (;Context
+  (Need to create variables
+   that are used outside current scope (stack frame)) 
+ )
+ 
+ (;Used for/eg
+ )
+ 
+ (;properties
+  static declared variables
+  last as long as the entire program lasts
+       ;instead of
+       as long as the local stack frame lasts)
+ 
+ (;contrastto
+  (dynamically allocated memory/variables
+   which have
+   lifetime from when it is explicitly allocated
+   to when it is explicitly freed)
+  (passing a buffer to a function
+   (and therefore allocating + freeing
+    in the same (outer) function))))
+
+(What does GiB mean?
+ 
+ (;Context
+  (Computers use base 2
+   Human number systems use base 10)
+  
+  (Human number systems
+   only approximate
+   what the computer creates)
+  
+  (;Used for
+   Computer actually has (2^16 - 1) addresses in a table
+   but we can only approximately refer to it
+   as 64 KB)
+  
+  (;properties
+   (number of bytes)  
+   1 KiB = 1024   = 2^10 
+   1 MiB = 1024^2 = 2^20
+   1 GiB = 1024^3 = 2^30
+   ;whereas
+   1 KB  = 1000
+   1 MB  = 1000^2
+   1 GB  = 1000^3)
+  
+  (;eg
+   2^32 bytes
+   is
+   2^2 * 2^30
+   is
+   4   * 2^30
+   is
+   4   * 1 GiB
+   is
+   4 GiB)))
+
+
+
+
+

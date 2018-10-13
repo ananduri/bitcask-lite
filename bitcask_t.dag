@@ -2,6 +2,15 @@
 
 (Create a prompt)
 
+(Design layout 
+ of segment file
+ 
+ (Remember to reserve byte for terminating '\0')
+ 
+ (What information needs to be stored?)
+ 
+ (How long each value is (how many bytes to read)))
+
 (Initialize in-memory hash-map
  
  (Allocate on the heap?)
@@ -13,14 +22,9 @@
   
   (Write a hash function)
   
-  (* Create array of pointers to singly linked lists)))
-
-(Design layout 
- of segment file
- 
- (What information needs to be stored?)
- 
- (How long each value is (how many bytes to read)))
+  (*Create array of pointers to singly linked lists
+   
+   (Check if current node is occupied somehow))))
 
 (Write key-values
  to a segment file)

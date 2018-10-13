@@ -31,6 +31,7 @@ const uint32_t VALUE_SIZE = 255;
 
 const uint32_t VALUE_NUM_BYTES_SIZE = sizeof(VALUE_SIZE);
 
+typedef struct Node_t Node;
 struct Node_t {
   //key (to match with when doing lookups)
   int key;
@@ -39,30 +40,31 @@ struct Node_t {
   //pointer to next node
   Node* next_node;
 };
-typedef struct Node_t Node;
+
 
 // hash function
 // a popular multiplier
 #define MULT 31
-unsigned int hash(char *p, int nhash) {
+#define NHASH 101
+unsigned int hash(char *p) {
   unsigned int h = 0;
   for (; *p; p++) {
     h = MULT * h + *p;
   }
-  return h % nhash;
+  return h % NHASH;
 }
 
 // returns pointer to array of pointers to linked lists
 // nhash denotes the length of the array of the hashmap
-Node** create_hashmap(int nhash) {
-  void* array = malloc(nhash * sizeof(Node*));
+Node** create_hashmap() {
+  void* array = malloc(NHASH * sizeof(Node*));
   return (Node**)array;
 }
 
 Node* get_bucket(Node** hashmap, int key) {
   unsigned int h = hash((char*)&key);
   Node* bucket_node = hashmap[h];
-  while ((bucket_node->key != NULL) && (bucket_node->key != key)) {
+  while (bucket_node->key != key) {
     bucket_node = bucket_node->next_node;
   }
   return bucket_node;
@@ -75,7 +77,7 @@ void insert_hashmap(Node** hashmap, int key, char* value) {
   Node* bucket_node = get_bucket(hashmap, key);
   
   bucket_node->key = key;
-  bucket_node->value = value;
+  bucket_node->value = value; //*** this is problematic; copy the array or do something else
   bucket_node->next_node = (Node*)malloc(sizeof(Node*));
   //is the key of the uninitialized but allocated next node
   //set to NULL?
