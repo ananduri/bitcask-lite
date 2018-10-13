@@ -1,0 +1,33 @@
+(Build working hash index storage engine)
+
+(Create a prompt)
+
+(Design layout 
+ of segment file
+ 
+ (What information needs to be stored?)
+ )
+
+(Write key-values
+ to a segment file)
+
+(Fragment segment files
+ 
+ (Close and store old file
+  when full)
+ 
+ (Create new segment file)
+ 
+ (Start writing to new segment file))
+
+(Compact closed segment files)
+
+(Merge closed segment files
+
+ (Compact and merge
+   simultaneously))
+
+(Implement multithreaded reads)
+
+(Compact and merge
+ in a background thread)

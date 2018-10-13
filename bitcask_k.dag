@@ -1,0 +1,13 @@
+(What's the difference between 
+ size_t and ssize_t?)
+
+(size_t is an unsigned integer type
+ used to represent sizes of objects)
+
+(ssize_t is a signed integer type
+ of the same width as size_t)
+
+(ssize_t is useful if
+ you return a negative number
+ repesenting an error)
+
