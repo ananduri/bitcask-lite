@@ -1,13 +1,48 @@
-(What's the difference between 
- size_t and ssize_t?)
+((What's the difference between 
+size_t and ssize_t?)
 
-(size_t is an unsigned integer type
- used to represent sizes of objects)
+ (size_t is an unsigned integer type
+  used to represent sizes of objects)
 
-(ssize_t is a signed integer type
- of the same width as size_t)
+ (ssize_t is a signed integer type
+   of the same width as size_t)
 
-(ssize_t is useful if
- you return a negative number
- repesenting an error)
+ (ssize_t is useful if
+  you return a negative number
+  repesenting an error))
 
+(What is uint32_t
+ and why is it used?
+)
+
+(When to use uint32_t vs. size_t?
+ 
+ (size_t is the type
+  for anything returned
+  by the sizeof() function)
+ 
+ (uint32_t is just a type
+  for integers, which is
+  32 bits wide))
+
+(What's the point of void pointers in C?
+ 
+ (? malloc returns only void pointers))
+
+(What properties should a hash function have?
+ 
+ (Use every part of the input)
+ 
+ (Cause avalanche
+  (slightly different inputs -> wildly different hashes))
+ 
+ (Rely on noncommutative operations
+  (Otherwise, permutations fail to hash to different values))
+ 
+ (Mix up the internal state (the hash) 
+  while folding in the input data
+  (eg:
+   h = (h << 4) ^ (h >> 28) ^ key[i])  
+  (Gets closer to achieving avalanche)
+  (Rotating hash, which does this, is minimal acceptable hash function))
+)

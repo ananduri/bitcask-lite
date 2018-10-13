@@ -2,11 +2,25 @@
 
 (Create a prompt)
 
+(Initialize in-memory hash-map
+ 
+ (Allocate on the heap?)
+ 
+ (Does C have data structures for this?
+  No)
+ 
+ (Create hash table, separate chaining
+  
+  (Write a hash function)
+  
+  (* Create array of pointers to singly linked lists)))
+
 (Design layout 
  of segment file
  
  (What information needs to be stored?)
- )
+ 
+ (How long each value is (how many bytes to read)))
 
 (Write key-values
  to a segment file)
@@ -31,3 +45,4 @@
 
 (Compact and merge
  in a background thread)
+
