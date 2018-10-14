@@ -18,7 +18,7 @@
  (Does C have data structures for this?
   No)
  
- (* Create hash table, separate chaining
+ (* Create hash table using separate chaining
   
   (Write a hash function
    (Defer creating a good one))
@@ -26,6 +26,9 @@
   (Create array of pointers to singly linked lists
    
    (Check if current node is occupied somehow))))
+
+(? Break out hashmap implementation
+   from rest of file)
 
 (Write key-values
  to a segment file)

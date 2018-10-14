@@ -226,3 +226,17 @@ size_t and ssize_t?)
  
  (;properties)
 )
+
+
+(Why can't you have
+ variable assignment
+ as the first thing in
+ a case block?
+ 
+ (there is a distinction
+  btw
+  declarations
+  and
+  statements
+  in C)
+  )

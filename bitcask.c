@@ -37,28 +37,33 @@ unsigned int hash(int key) {
 
 // returns pointer to array of pointers to linked lists
 Node** create_hashmap() {
-  void* array = malloc(NHASH * sizeof(Node*));
-  return (Node**)array;
+  Node** array = (Node**)malloc(NHASH * sizeof(Node*));
+  for (int i = 0; i < NHASH; i++) {
+    array[i] = (Node*)malloc(sizeof(Node));
+    array[i]->next_node = NULL;
+  }
+  return array;
 }
 
 Node* get_bucket(Node** hashmap, int key) {
   unsigned int h = hash(key);
+  printf("hash is: %u\n", h);
   Node* bucket_node = hashmap[h];
-  while (bucket_node->key != key) {
+  
+  while ((bucket_node->next_node != NULL) &&
+      (bucket_node->key != key)) {
     bucket_node = bucket_node->next_node;
   }
+
   return bucket_node;
 }
 
 void insert_hashmap(Node** hashmap, int key, char* value) {
-  //hash the key
-  //get the linked list at that value in the hashmap array
-  //add a node with the value
   Node* bucket_node = get_bucket(hashmap, key);
   
   bucket_node->key = key;
   strcpy(bucket_node->value, value);
-  bucket_node->next_node = (Node*)malloc(sizeof(Node*));
+  bucket_node->next_node = (Node*)malloc(sizeof(Node));
 }
  
 char* get_hashmap(Node** hashmap, int key) {
@@ -96,16 +101,22 @@ InputBuffer* new_input_buffer() {
 }
 
 struct KeyValue_t {
-  char key[KEY_NUM_BYTES];
+  int key;
   char value[VALUE_NUM_BYTES];
 };
 typedef struct KeyValue_t KeyValue;
 
 enum ProcessResult_t {
-  SUCCESS,
-  ERROR,
+  PROCESS_SUCCESS,
+  PROCESS_ERROR,
 };
 typedef enum ProcessResult_t ProcessResult;
+
+enum ExecuteResult_t {
+  EXECUTE_SUCCESS,
+  EXECUTE_ERROR,
+};
+typedef enum ExecuteResult_t ExecuteResult;
 
 enum CommandType_t {
   SET,
@@ -145,42 +156,63 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
   } else if (strncmp(input_buffer->buffer, "set ", 4) == 0) {
     command->type = SET;
     
-    printf("command type set to SET\n");
-    
     char* keyword = strtok(input_buffer->buffer, " ");
-    char* key = strtok(NULL, " ");
+    char* key_string = strtok(NULL, " ");
+    int key = atoi(key_string);
     char* value = strtok(NULL, " ");
-    
-    if (key == NULL || value == NULL) {
+        
+    if (key_string == NULL || value == NULL) {
       //return error
-      return ERROR;
+      return PROCESS_ERROR;
     }
     
-    if (strlen(key) > KEY_NUM_BYTES) {
+    //~ are these valid quantities to be comparing?
+    if (strlen(key_string) > KEY_NUM_BYTES) {
       //return key too long error
-      return ERROR;
+      return PROCESS_ERROR;
     }
     
     if (strlen(value) > VALUE_NUM_BYTES) {
       //return value too long error
-      return ERROR;
+      return PROCESS_ERROR;
     }
     
-    strcpy(command->keyvalue.key, key);
+    command->keyvalue.key = key;
     strcpy(command->keyvalue.value, value);
-        
-    printf("key: %s\n", command->keyvalue.key);
-    printf("value: %s\n", command->keyvalue.value);
-    return SUCCESS;
+    
+    return PROCESS_SUCCESS;
   } else if (strncmp(input_buffer->buffer, "get ", 4) == 0) {
     command->type = GET;
-    //read in key
     
-    return SUCCESS;
+    char* keyword = strtok(input_buffer->buffer, " ");
+    char* key_string = strtok(NULL, " ");
+    int key = atoi(key_string);
+
+    if (key_string == NULL) {
+      return PROCESS_ERROR;
+    }
+    
+    command->keyvalue.key = key;
+    
+    return PROCESS_SUCCESS;
   } else {
     printf("Unrecognized command '%s'\n", input_buffer->buffer);
-    return ERROR;
+    return PROCESS_ERROR;
   }
+}
+
+ExecuteResult execute_command(Command* command, Node** hashmap) {
+  char* value;
+  switch (command->type) {
+    case SET:
+      insert_hashmap(hashmap, command->keyvalue.key, command->keyvalue.value);
+      break;
+    case GET:
+      value = get_hashmap(hashmap, command->keyvalue.key);
+      printf("%s\n", value);
+      break;
+  }
+  return EXECUTE_SUCCESS;
 }
 
 int main(int argc, char* argv[]) {
@@ -191,6 +223,21 @@ int main(int argc, char* argv[]) {
   while (true) {
     print_prompt();
     read_input(input_buffer); //puts input in the buffer of input_buffer
-    process_command(input_buffer, &command);
+        
+    switch (process_command(input_buffer, &command)) {
+      case PROCESS_SUCCESS:
+        break;
+      case PROCESS_ERROR:
+        printf("Error processing command\n");
+        break;
+    }
+
+    switch (execute_command(&command, hashmap)) {
+      case EXECUTE_SUCCESS:
+        printf("Executed\n");
+        break;
+      case EXECUTE_ERROR:
+        printf("Error: \n");
+    }
   }
 }
