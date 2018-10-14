@@ -148,17 +148,45 @@ size_t and ssize_t?)
    1 GB  = 1000^3)
   
   (;eg
-   2^32 bytes
-   is
+  2^32 bytes
+      is
    2^2 * 2^30
-   is
-   4   * 2^30
-   is
-   4   * 1 GiB
-   is
-   4 GiB)))
+      is
+     4 * 2^30
+      is
+     4 * 1 GiB
+      is
+     4 GiB)))
+
+(Write the key to disk as a char array
+ even though it's an int?)
 
 
+(How do you split strings in C?
+ 
+ (strtok(string, delimiter);)
+ 
+ (Use NULL as first argument
+  on subsequent calls
+  to keep splitting
+  the same string))
 
 
-
+(Do you need to free resources
+ if you're exiting
+ a C program?
+ 
+ (Technically the memory is recovered)
+ 
+ (But
+  (It's considered good practice) 
+  (It demands and shows
+   your understanding of
+   the memory usage of
+   your program)
+  (It can lead to bugs in
+   long-lived programs))
+ 
+ (So, yes
+  you do need to free resources
+  upon exit))

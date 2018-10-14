@@ -22,7 +22,7 @@
   
   (Write a hash function)
   
-  (*Create array of pointers to singly linked lists
+  (* Create array of pointers to singly linked lists
    
    (Check if current node is occupied somehow))))
 

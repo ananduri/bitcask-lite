@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gcc bitcask.c -o bc
+gcc -Wall bitcask.c -o bc
