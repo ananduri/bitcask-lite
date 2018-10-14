@@ -24,12 +24,13 @@ struct Node_t {
   Node* next_node;
 };
 
-#define MULT 31  //effective multiplier
+#define MULT 31  //effective multiplier (according to Bentley)
 #define NHASH 101  //prime near hash table capacity
-unsigned int hash(char *p) {
+unsigned int hash(int key) {
+  /* homemade shitty hash function */
   unsigned int h = 0;
-  for (; *p; p++) {
-    h = MULT * h + *p;
+  for (; key; key >>= 1) {
+    h = MULT * h + (key & 1);
   }
   return h % NHASH;
 }
@@ -41,7 +42,7 @@ Node** create_hashmap() {
 }
 
 Node* get_bucket(Node** hashmap, int key) {
-  unsigned int h = hash((char*)&key);
+  unsigned int h = hash(key);
   Node* bucket_node = hashmap[h];
   while (bucket_node->key != key) {
     bucket_node = bucket_node->next_node;

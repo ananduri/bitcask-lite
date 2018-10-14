@@ -190,3 +190,39 @@ size_t and ssize_t?)
  (So, yes
   you do need to free resources
   upon exit))
+
+
+(Do I have to convert the int key
+ to a char
+ to hash it?)
+
+
+(Diff btw
+ regexp patterns
+ ;and
+ glob patterns?
+
+ (;usedfor
+  (regexp:
+   matching any text)
+  (glob:
+   matching file names))
+ 
+ (;properties
+  (*
+   regexp: any number /of previous char/
+   glob:   any number /of any char/)
+   
+  (?
+   regexp: one or more /of previous char/
+   glob:   one or more /of char any/)))
+
+
+(What is 'unsigned' in C?
+ 
+ (;context)
+ 
+ (;usedfor)
+ 
+ (;properties)
+)
