@@ -18,20 +18,30 @@
  (Does C have data structures for this?
   No)
  
- (* Create hash table using separate chaining
+ (-> Create hash table using separate chaining
   
   (Write a hash function
    (Defer creating a good one))
   
   (Create array of pointers to singly linked lists
    
-   (Check if current node is occupied somehow))))
+   (Check if current node is occupied somehow))
+  
+  (-> Implement error handling
+   
+   (* Get on a key that doesn't exist in the hash table)
+   
+   (Insert a value that doesn't fit in the allocated space))
+   ))
 
 (? Break out hashmap implementation
    from rest of file)
 
 (Write key-values
- to a segment file)
+ to a segment file
+ 
+ (Get a file descriptor)
+ )
 
 (Fragment segment files
  
