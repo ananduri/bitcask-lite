@@ -45,23 +45,44 @@ Node** create_hashmap() {
   return array;
 }
 
+/*
+ * This function returns either the node
+ * corresponding to the key,
+ * or the last node in the list in the bucket
+ * corresponding to the key. 
+ * In the latter case,
+ * the calling function has to allocate
+ * a new node, and store the key/value inside.
+ */
 Node* get_bucket(Node** hashmap, int key) {
   unsigned int h = hash(key);
-  printf("hash is: %u\n", h);
+  //printf("hash is: %u\n", h);
   Node* bucket_node = hashmap[h];
   
   while ((bucket_node->next_node != NULL) &&
       (bucket_node->key != key)) {
+    printf("key: %d\n", bucket_node->key);
     bucket_node = bucket_node->next_node;
   }
-
+  
   return bucket_node;
 }
 
 void insert_hashmap(Node** hashmap, int key, char* value) {
   Node* bucket_node = get_bucket(hashmap, key);
+  if (bucket_node->key != key) {
+    //allocate new node.
+    Node* new_node = (Node*)malloc(sizeof(Node));
+    bucket_node->next_node = new_node;
+    new_node->key = key;
+    strcpy(bucket_node->value, value);
+    new_node->next_node = (Node*)malloc(sizeof(Node));
+    return;
+  }
+  printf("x: %d\n", bucket_node->key);
   
   bucket_node->key = key;
+  printf("xx: %d\n", bucket_node->key);
   strcpy(bucket_node->value, value);
   bucket_node->next_node = (Node*)malloc(sizeof(Node));
 }
@@ -69,7 +90,10 @@ void insert_hashmap(Node** hashmap, int key, char* value) {
 char* get_hashmap(Node** hashmap, int key) {
   //hash the key
   //get the linked list at that value in the hashmap array  
-  Node* bucket_node = get_bucket(hashmap, key);  
+  Node* bucket_node = get_bucket(hashmap, key);
+  if (bucket_node == NULL) {
+    return NULL; //not good, can't dist. btw bucket not found and bucket's value being NULL
+  }
   return bucket_node->value;
 }
 
@@ -206,13 +230,15 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
   switch (command->type) {
     case SET:
       insert_hashmap(hashmap, command->keyvalue.key, command->keyvalue.value);
-      break;
+      return EXECUTE_SUCCESS;
     case GET:
       value = get_hashmap(hashmap, command->keyvalue.key);
+      if (value == NULL) {
+        return EXECUTE_ERROR;
+      }
       printf("%s\n", value);
-      break;
+      return EXECUTE_SUCCESS;
   }
-  return EXECUTE_SUCCESS;
 }
 
 int main(int argc, char* argv[]) {
@@ -237,7 +263,7 @@ int main(int argc, char* argv[]) {
         printf("Executed\n");
         break;
       case EXECUTE_ERROR:
-        printf("Error: \n");
+        printf("Error\n");
     }
   }
 }

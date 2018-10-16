@@ -29,7 +29,7 @@
   
   (-> Implement error handling
    
-   (* Get on a key that doesn't exist in the hash table)
+   (* GET on a key that doesn't exist in the hash table)
    
    (Insert a value that doesn't fit in the allocated space))
    ))
