@@ -11,7 +11,7 @@
  */
 //need to reserve an extra char for null terminator?
 const uint32_t KEY_NUM_BYTES = 32;
-const uint32_t VALUE_NUM_BYTES = 256;
+const uint32_t VALUE_NUM_BYTES = 25;
 //const uint32_t VALUE_NUM_BYTES_SIZE = sizeof(VALUE_NUM_BYTES);
 
 /*
@@ -240,6 +240,9 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
   char* value;
   switch (command->type) {
     case SET:
+      if (strlen(command->keyvalue.value) > VALUE_NUM_BYTES) {
+        return EXECUTE_ERROR;
+      }
       insert_hashmap(hashmap, command->keyvalue.key, command->keyvalue.value);
       return EXECUTE_SUCCESS;
     case GET:
@@ -266,7 +269,7 @@ int main(int argc, char* argv[]) {
         break;
       case PROCESS_ERROR:
         printf("Error processing command\n");
-        break;
+        return -1;
     }
 
     switch (execute_command(&command, hashmap)) {
@@ -275,6 +278,7 @@ int main(int argc, char* argv[]) {
         break;
       case EXECUTE_ERROR:
         printf("Error\n");
+        break;
     }
   }
 }
