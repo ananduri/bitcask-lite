@@ -35,12 +35,21 @@ unsigned int hash(int key) {
   return h % NHASH;
 }
 
-// returns pointer to array of pointers to linked lists
+/*
+ * returns pointer to array of pointers to linked lists.
+ *
+ * since values desribe offsets in a file,
+ * -1 is an invalid value
+ * and can therefore serve as a sentinal value
+ * for an unoccupied node
+ */
 Node** create_hashmap() {
   Node** array = (Node**)malloc(NHASH * sizeof(Node*));
   for (int i = 0; i < NHASH; i++) {
     array[i] = (Node*)malloc(sizeof(Node));
     array[i]->next_node = NULL;
+    
+    strcpy(array[i]->value, "-1");
   }
   return array;
 }
@@ -50,15 +59,15 @@ Node** create_hashmap() {
  * corresponding to the key,
  * or the last node in the list in the bucket
  * corresponding to the key. 
+ *
  * In the latter case,
  * the calling function has to allocate
  * a new node, and store the key/value inside.
  */
 Node* get_bucket(Node** hashmap, int key) {
   unsigned int h = hash(key);
-  //printf("hash is: %u\n", h);
   Node* bucket_node = hashmap[h];
-  
+    
   while ((bucket_node->next_node != NULL) &&
       (bucket_node->key != key)) {
     printf("key: %d\n", bucket_node->key);
@@ -70,8 +79,14 @@ Node* get_bucket(Node** hashmap, int key) {
 
 void insert_hashmap(Node** hashmap, int key, char* value) {
   Node* bucket_node = get_bucket(hashmap, key);
+  
+  if (strcmp(bucket_node->value, "-1") == 0) {
+    bucket_node->key = key;
+    strcpy(bucket_node->value, value);
+    return;
+  }
+  
   if (bucket_node->key != key) {
-    //allocate new node.
     Node* new_node = (Node*)malloc(sizeof(Node));
     bucket_node->next_node = new_node;
     new_node->key = key;
@@ -79,20 +94,16 @@ void insert_hashmap(Node** hashmap, int key, char* value) {
     new_node->next_node = (Node*)malloc(sizeof(Node));
     return;
   }
-  printf("x: %d\n", bucket_node->key);
   
   bucket_node->key = key;
-  printf("xx: %d\n", bucket_node->key);
   strcpy(bucket_node->value, value);
   bucket_node->next_node = (Node*)malloc(sizeof(Node));
 }
  
 char* get_hashmap(Node** hashmap, int key) {
-  //hash the key
-  //get the linked list at that value in the hashmap array  
   Node* bucket_node = get_bucket(hashmap, key);
-  if (bucket_node == NULL) {
-    return NULL; //not good, can't dist. btw bucket not found and bucket's value being NULL
+  if (bucket_node == NULL || strcmp(bucket_node->value, "-1") == 0) {
+    return NULL;
   }
   return bucket_node->value;
 }
