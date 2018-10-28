@@ -27,7 +27,7 @@
    
    (Check if current node is occupied somehow))
   
-  (-> Implement error handling
+  (Implement error handling
    
    (GET on a key that doesn't exist in the hash table)
    
@@ -40,7 +40,10 @@
  to a segment file
  
  (Get a file descriptor)
- )
+ 
+ (Write the length of the keyvalue to the file)
+ 
+ (Write the keyvalue to the file))
 
 (Fragment segment files
  

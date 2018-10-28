@@ -165,6 +165,30 @@ struct Command_t {
 };
 typedef struct Command_t Command;
 
+int append_to_segment(KeyValue keyvalue) {
+  //for now, keep appending to the same file
+  //get the location where we started appending in the file
+  //need to append the key and the value,
+  //to check if this is the right keyvalue and therefore the right file later on,
+  //when we have multiple files
+  int offset;
+  FILE* pfile;
+  pfile = fopen("segment0", "ab");
+  if (pfile == NULL) {
+    perror ("Error opening file");
+    offset = -1;
+  } else {
+    // have to flush before this?
+    offset = ftell(pfile);
+    //first write the length of the keyvalue in bytes,
+    //then write the keyvalue itself.
+    
+    //bytes_written = write(pfile, keyvalue, sizeof(KeyValue));
+    fclose(pfile);
+  }
+  return offset;
+}
+  
 
 void read_input(InputBuffer* input_buffer) {
   ssize_t bytes_read = getline(&(input_buffer->buffer), 
@@ -191,6 +215,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
   } else if (strncmp(input_buffer->buffer, "set ", 4) == 0) {
     command->type = SET;
     
+    //keyword is not used
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
@@ -219,6 +244,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
   } else if (strncmp(input_buffer->buffer, "get ", 4) == 0) {
     command->type = GET;
     
+    //keyword is not used
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
@@ -239,11 +265,17 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
 ExecuteResult execute_command(Command* command, Node** hashmap) {
   char* value;
   switch (command->type) {
-    case SET:
+    case SET: 
       if (strlen(command->keyvalue.value) > VALUE_NUM_BYTES) {
         return EXECUTE_ERROR;
       }
-      insert_hashmap(hashmap, command->keyvalue.key, command->keyvalue.value);
+      int offset = append_to_segment(command->keyvalue);
+      //todo:insert the offset in the file into the hashmap
+      if (offset == -1) {
+        return EXECUTE_ERROR;
+      }
+      printf("offset: %d\n", offset);
+      insert_hashmap(hashmap, command->keyvalue.key, (char*)&offset);
       return EXECUTE_SUCCESS;
     case GET:
       value = get_hashmap(hashmap, command->keyvalue.key);

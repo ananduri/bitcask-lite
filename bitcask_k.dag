@@ -240,3 +240,15 @@ size_t and ssize_t?)
   statements
   in C)
   )
+
+
+
+
+
+(How to keep track of the segment files?)
+
+
+
+(Use paging for bitcask-lite?
+ Or does appending to the same file always
+ automatically cache)
