@@ -13,11 +13,6 @@
 
 (Initialize in-memory hash-map
  
- (Allocate on the heap?)
- 
- (Does C have data structures for this?
-  No)
- 
  (Create hash table using separate chaining
   
   (Write a hash function
@@ -44,6 +39,15 @@
  (Write the length of the keyvalue to the file)
  
  (Write the keyvalue to the file))
+ 
+
+
+
+ 
+
+
+
+ 
 
 (Fragment segment files
  

@@ -113,7 +113,7 @@ size_t and ssize_t?)
        ;instead of
        as long as the local stack frame lasts)
  
- (;contrastto
+ (;contrastTo
   (dynamically allocated memory/variables
    which have
    lifetime from when it is explicitly allocated

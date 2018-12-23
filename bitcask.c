@@ -74,6 +74,7 @@ Node* get_bucket(Node** hashmap, int key) {
     bucket_node = bucket_node->next_node;
   }
   
+  printf("key: %d\n", bucket_node->key);
   return bucket_node;
 }
 
@@ -81,6 +82,7 @@ void insert_hashmap(Node** hashmap, int key, char* value) {
   Node* bucket_node = get_bucket(hashmap, key);
   
   if (strcmp(bucket_node->value, "-1") == 0) {
+    /* does anything need to happen here? */
     bucket_node->key = key;
     strcpy(bucket_node->value, value);
     return;
@@ -109,7 +111,7 @@ char* get_hashmap(Node** hashmap, int key) {
 }
 
 void cleanup_hashmap() {
-  //free all pointers
+  //TODO: free all pointers
   printf("You forgot to cleanup\n");
 }
 
@@ -215,7 +217,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
   } else if (strncmp(input_buffer->buffer, "set ", 4) == 0) {
     command->type = SET;
     
-    //keyword is not used
+    //this keyword var is not used
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
@@ -226,7 +228,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
       return PROCESS_ERROR;
     }
     
-    //~ are these valid quantities to be comparing?
+    //are these valid quantities to be comparing?
     if (strlen(key_string) > KEY_NUM_BYTES) {
       //return key too long error
       return PROCESS_ERROR;
@@ -270,7 +272,7 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
         return EXECUTE_ERROR;
       }
       int offset = append_to_segment(command->keyvalue);
-      //todo:insert the offset in the file into the hashmap
+      //TODO: insert the offset in the file into the hashmap
       if (offset == -1) {
         return EXECUTE_ERROR;
       }
