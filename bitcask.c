@@ -16,6 +16,8 @@ const uint32_t VALUE_NUM_BYTES = 25;
 
 /*
  * In-memory hash table
+ * Write some tests explicitly for this.
+ * Don't need to use a fancy framework, just make them automatic to run.
  */
 typedef struct Node_t Node;
 struct Node_t {
@@ -36,9 +38,9 @@ unsigned int hash(int key) {
 }
 
 /*
- * returns pointer to array of pointers to linked lists.
+ * Returns pointer to array of pointers to linked lists.
  *
- * since values desribe offsets in a file,
+ * Since values desribe offsets in a file,
  * -1 is an invalid value
  * and can therefore serve as a sentinal value
  * for an unoccupied node
@@ -82,7 +84,7 @@ void insert_hashmap(Node** hashmap, int key, char* value) {
   Node* bucket_node = get_bucket(hashmap, key);
   
   if (strcmp(bucket_node->value, "-1") == 0) {
-    /* does anything need to happen here? */
+    /* Do we need these two lines of code here? */
     bucket_node->key = key;
     strcpy(bucket_node->value, value);
     return;
@@ -115,6 +117,7 @@ void cleanup_hashmap() {
   printf("You forgot to cleanup\n");
 }
 
+// End of in-memory hash table.
 
 
 
@@ -168,26 +171,59 @@ struct Command_t {
 typedef struct Command_t Command;
 
 int append_to_segment(KeyValue keyvalue) {
-  //for now, keep appending to the same file
-  //get the location where we started appending in the file
-  //need to append the key and the value,
-  //to check if this is the right keyvalue and therefore the right file later on,
-  //when we have multiple files
+  /* for now, keep appending to the same file 
+   * get the location where we started appending in the file 
+   * need to append the key and the value, 
+   * to check if this is the right keyvalue and therefore the right file later on, 
+   * when we have multiple files */
   int offset;
   FILE* pfile;
   pfile = fopen("segment0", "ab");
   if (pfile == NULL) {
     perror ("Error opening file");
-    offset = -1;
-  } else {
-    // have to flush before this?
-    offset = ftell(pfile);
-    //first write the length of the keyvalue in bytes,
-    //then write the keyvalue itself.
-    
-    //bytes_written = write(pfile, keyvalue, sizeof(KeyValue));
-    fclose(pfile);
+    offset = -1; 
+    return offset;
   }
+  offset = ftell(pfile); //does this do anything?
+
+  //first write the length of the keyvalue in bytes,
+  //then write the keyvalue itself.
+  //isn't sizeof(KeyValue) a constant? 
+  //
+  //write the following:
+  //1. size of the key
+  //putw(sizeof(int), pfile);
+  //int retval = fwrite(sizeof(int), sizeof(sizeof(int)), 1, pfile);
+  putw(sizeof(int), pfile);
+  /* if (retval != 1) { */
+  /*   perror ("Error opening file"); */
+  /*   offset = -1;  */
+  /*   return offset; */
+  /* } */
+  //2. size of the value
+  //retval = fwrite(VALUE_NUM_BYTES, sizeof(uint32_t), 1, pfile);
+  putw(VALUE_NUM_BYTES, pfile);
+  /* if (retval != 1) { */
+  /*   perror ("Error opening file"); */
+  /*   offset = -1;  */
+  /*   return offset; */
+  /* } */
+  //3. key
+  int retval = fwrite(&keyvalue.key, sizeof(int), 1, pfile);
+  if (retval != 1) {
+    perror ("Error opening file");
+    offset = -1; 
+    return offset;
+  }
+  //4. value
+  retval = fwrite(&keyvalue.value, VALUE_NUM_BYTES, 1, pfile);
+  if (retval != 1) {
+    perror ("Error opening file");
+    offset = -1; 
+    return offset;
+  }
+
+  fclose(pfile);
   return offset;
 }
   

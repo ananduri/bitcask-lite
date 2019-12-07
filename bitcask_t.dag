@@ -31,14 +31,14 @@
 (? Break out hashmap implementation
    from rest of file)
 
-(* Write key-values
+(Write key-values
  to a segment file
  
- (Get a file descriptor)
- 
- (Write the length of the keyvalue to the file)
- 
- (Write the keyvalue to the file))
+ (* Get a file descriptor)
+
+ (Write the keysize, valuesize, key, and value
+  Write the things inside the structs, not the struct itself)
+  Code: focus on the `append_to_segment` function)
  
 
 
