@@ -257,6 +257,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
+    // print key out
     char* value = strtok(NULL, " ");
         
     if (key_string == NULL || value == NULL) {
@@ -264,7 +265,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
       return PROCESS_ERROR;
     }
     
-    //are these valid quantities to be comparing?
+    //meta: are these valid quantities to be comparing?
     if (strlen(key_string) > KEY_NUM_BYTES) {
       //return key too long error
       return PROCESS_ERROR;
@@ -277,8 +278,8 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
     
     command->keyvalue.key = key;
     strcpy(command->keyvalue.value, value);
-    
     return PROCESS_SUCCESS;
+    
   } else if (strncmp(input_buffer->buffer, "get ", 4) == 0) {
     command->type = GET;
     

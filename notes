@@ -1,0 +1,5 @@
+get is not working.
+
+Because the in-memory hashmap has to be re-loaded from disk when the program is started again.
+
+Have a load command? Otherwise, must not overwrite existing segment files.
