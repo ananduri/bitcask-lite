@@ -3,3 +3,31 @@ get is not working.
 Because the in-memory hashmap has to be re-loaded from disk when the program is started again.
 
 Have a load command? Otherwise, must not overwrite existing segment files.
+
+
+the bytes appended at the end are system-dependent.
+
+strace:
+strace: Process 94085 attached
+read(0, "set 1 a\n", 1024)              = 8
+openat(AT_FDCWD, "segment0", O_WRONLY|O_CREAT|O_APPEND, 0666) = 3
+lseek(3, 0, SEEK_END)                   = 74
+lseek(3, 0, SEEK_CUR)                   = 74
+fstat(3, {st_mode=S_IFREG|0644, st_size=74, ...}) = 0
+write(3, "\4\0\0\0\31\0\0\0\1\0\0\0a\0\317\25zU\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 37) = 37
+close(3)                                = 0
+write(1, "offset: 74\n", 11)            = 11
+write(1, "Executed\n", 9)               = 9
+write(1, "bitcask-lite> ", 14)          = 14
+read(0, ".exit\n", 1024)                = 6
+write(1, "You forgot to cleanup\n", 22) = 22
+exit_group(0)                           = ?
++++ exited with 0 +++
+
+
+Make a makefile
+to compile and also
+to clear the segments, as part of make clean
+
+strcpy copies until it hits a null byte (and includes that),
+maybe that's where the mystery bytes are coming from.

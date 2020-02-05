@@ -10,9 +10,8 @@
  * Data layout of the segment file
  */
 //need to reserve an extra char for null terminator?
-const uint32_t KEY_NUM_BYTES = 32;
-const uint32_t VALUE_NUM_BYTES = 25;
-//const uint32_t VALUE_NUM_BYTES_SIZE = sizeof(VALUE_NUM_BYTES);
+#define KEY_NUM_BYTES 32
+#define VALUE_NUM_BYTES 25
 
 /*
  * In-memory hash table
@@ -72,11 +71,9 @@ Node* get_bucket(Node** hashmap, int key) {
     
   while ((bucket_node->next_node != NULL) &&
       (bucket_node->key != key)) {
-    printf("key: %d\n", bucket_node->key);
     bucket_node = bucket_node->next_node;
   }
   
-  printf("key: %d\n", bucket_node->key);
   return bucket_node;
 }
 
@@ -192,24 +189,23 @@ int append_to_segment(KeyValue keyvalue) {
   //
   //write the following:
   //1. size of the key
-  //putw(sizeof(int), pfile);
+  int retval = putw(sizeof(int), pfile);
   //int retval = fwrite(sizeof(int), sizeof(sizeof(int)), 1, pfile);
-  putw(sizeof(int), pfile);
-  /* if (retval != 1) { */
-  /*   perror ("Error opening file"); */
-  /*   offset = -1;  */
-  /*   return offset; */
-  /* } */
+  if (retval != 0) {
+    perror ("Error opening file");
+    offset = -1;
+    return offset;
+  }
   //2. size of the value
   //retval = fwrite(VALUE_NUM_BYTES, sizeof(uint32_t), 1, pfile);
-  putw(VALUE_NUM_BYTES, pfile);
-  /* if (retval != 1) { */
-  /*   perror ("Error opening file"); */
-  /*   offset = -1;  */
-  /*   return offset; */
-  /* } */
+  retval = putw(VALUE_NUM_BYTES, pfile);
+  if (retval != 0) {
+    perror ("Error opening file");
+    offset = -1;
+    return offset;
+  }
   //3. key
-  int retval = fwrite(&keyvalue.key, sizeof(int), 1, pfile);
+  retval = fwrite(&keyvalue.key, sizeof(int), 1, pfile);
   if (retval != 1) {
     perror ("Error opening file");
     offset = -1; 
@@ -257,8 +253,13 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
-    // print key out
+
     char* value = strtok(NULL, " ");
+    // print out contents of this value char array
+    /* while (pointer is not terminating null byte) { */
+    /*   print what value points to; */
+    /*   advance value by 4 bytes (char value); */
+    /* } */
         
     if (key_string == NULL || value == NULL) {
       //return error
@@ -323,6 +324,8 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       }
       printf("%s\n", value);
       return EXECUTE_SUCCESS;
+    default:
+      return EXECUTE_ERROR;
   }
 }
 
