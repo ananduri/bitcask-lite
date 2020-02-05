@@ -260,7 +260,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
     /*   print what value points to; */
     /*   advance value by 4 bytes (char value); */
     /* } */
-        
+    
     if (key_string == NULL || value == NULL) {
       //return error
       return PROCESS_ERROR;
@@ -332,7 +332,8 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
 int main(int argc, char* argv[]) {
   Node** hashmap = create_hashmap();
   
-  Command command;
+  Command command = {0};
+  //command.keyvalue.value = {0};
   InputBuffer* input_buffer = new_input_buffer();
   while (true) {
     print_prompt();

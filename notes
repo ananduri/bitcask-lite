@@ -29,5 +29,6 @@ Make a makefile
 to compile and also
 to clear the segments, as part of make clean
 
-strcpy copies until it hits a null byte (and includes that),
-maybe that's where the mystery bytes are coming from.
+I didn't initialize the keyvalue struct to 0s,
+so garbage bytes were being copied by fwrite,
+since it copies over the entire buffer (command.keyvalue.value).
