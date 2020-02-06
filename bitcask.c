@@ -13,7 +13,7 @@
 #define KEY_NUM_BYTES 32
 #define VALUE_NUM_BYTES 25
 
-/*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * In-memory hash table
  * Write some tests explicitly for this.
  * Don't need to use a fancy framework, just make them automatic to run.
@@ -21,7 +21,7 @@
 typedef struct Node_t Node;
 struct Node_t {
   int key;
-  char value[VALUE_NUM_BYTES];
+  char value[VALUE_NUM_BYTES];  // this is probably not what we want right?
   Node* next_node;
 };
 
@@ -114,12 +114,8 @@ void cleanup_hashmap() {
   printf("You forgot to cleanup\n");
 }
 
-// End of in-memory hash table.
-
-
-
-
-
+/* End of in-memory hash table.
+ *  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 struct InputBuffer_t {
   char* buffer;
@@ -329,8 +325,51 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
   }
 }
 
+int load_segment_into_memory(/*take file descriptor?*/) {
+  // open file and read
+}
+
 int main(int argc, char* argv[]) {
   Node** hashmap = create_hashmap();
+
+  // check if a segment file exists on disk,
+  // and if so, load that data into the in-memory hashmap.
+  FILE *segment_p;
+  segment_p = fopen("segment0", "r");
+  if (segment_p != NULL) {
+    // assume starting at data for size of key, read that -> sk
+    //   need to know the size of the data for the size of the key
+    //   we know it is sizeof(int) which is...
+    // then read size of value -> sv
+    // then, next sk bytes, read and -> key
+    // then, get offset after key, and -> value of hash table
+    int retval;
+    int size_k;  // some confusion to be resolved here around the void*
+    retval = fread(/* (void*) */ &size_k, sizeof(sizeof(int)), 1, segment_p);
+    if (retval == 0) {
+      printf("error while reading segment file.");
+      return 0;
+    }
+    // does it seek automatically? is the offset stored in the FILE struct? yes
+    int size_v;
+    retval = fread(&size_v, sizeof(int), 1, segment_p);
+    if (retval == 0) {
+      printf("error while reading segment file.");
+      return 0;
+    }
+    int key;
+    retval = fread(&key, size_k, 1, segment_p);
+    if (retval == 0) {
+      printf("error while reading segment file.");
+      return 0;
+    }
+    int offset = ftell(segment_p);
+
+    // shit... do i have the wrong types in the hashmap
+    insert_hashmap(hashmap, key, offset);
+  }
+  /* Is the way values are being written to file problematic... yes */
+
   
   Command command = {0};
   //command.keyvalue.value = {0};

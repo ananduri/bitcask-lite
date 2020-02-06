@@ -34,11 +34,13 @@
 (Write key-values
  to a segment file
  
- (* Get a file descriptor)
+ (Get a file descriptor)
 
  (Write the keysize, valuesize, key, and value
   Write the things inside the structs, not the struct itself)
   Code: focus on the `append_to_segment` function)
+  
+ (Include code for variable-sized values--this has to be done, actually)
  
 
 
