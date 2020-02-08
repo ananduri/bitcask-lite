@@ -1,0 +1,130 @@
+execve("/usr/bin/bc", ["bc"], 0x7ffdba073950 /* 59 vars */) = 0
+brk(NULL)                               = 0x559e6a75a000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 6
+fstat(6, {st_mode=S_IFREG|0644, st_size=144907, ...}) = 0
+mmap(NULL, 144907, PROT_READ, MAP_PRIVATE, 6, 0) = 0x7f7d6b2cd000
+close(6)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libreadline.so.8", O_RDONLY|O_CLOEXEC) = 6
+read(6, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\260x\1\0\0\0\0\0"..., 832) = 832
+fstat(6, {st_mode=S_IFREG|0644, st_size=329768, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f7d6b2cb000
+mmap(NULL, 337432, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 6, 0) = 0x7f7d6b278000
+mmap(0x7f7d6b28e000, 167936, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x16000) = 0x7f7d6b28e000
+mmap(0x7f7d6b2b7000, 40960, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x3f000) = 0x7f7d6b2b7000
+mmap(0x7f7d6b2c1000, 36864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x48000) = 0x7f7d6b2c1000
+mmap(0x7f7d6b2ca000, 1560, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f7d6b2ca000
+close(6)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libncurses.so.6", O_RDONLY|O_CLOEXEC) = 6
+read(6, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\216\0\0\0\0\0\0"..., 832) = 832
+fstat(6, {st_mode=S_IFREG|0644, st_size=165968, ...}) = 0
+mmap(NULL, 168328, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 6, 0) = 0x7f7d6b24e000
+mprotect(0x7f7d6b256000, 131072, PROT_NONE) = 0
+mmap(0x7f7d6b256000, 102400, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x8000) = 0x7f7d6b256000
+mmap(0x7f7d6b26f000, 24576, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x21000) = 0x7f7d6b26f000
+mmap(0x7f7d6b276000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x27000) = 0x7f7d6b276000
+close(6)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libtinfo.so.6", O_RDONLY|O_CLOEXEC) = 6
+read(6, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\351\0\0\0\0\0\0"..., 832) = 832
+fstat(6, {st_mode=S_IFREG|0644, st_size=191872, ...}) = 0
+mmap(NULL, 194944, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 6, 0) = 0x7f7d6b21e000
+mmap(0x7f7d6b22c000, 61440, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0xe000) = 0x7f7d6b22c000
+mmap(0x7f7d6b23b000, 57344, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x1d000) = 0x7f7d6b23b000
+mmap(0x7f7d6b249000, 20480, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x2a000) = 0x7f7d6b249000
+close(6)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 6
+read(6, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\320l\2\0\0\0\0\0"..., 832) = 832
+fstat(6, {st_mode=S_IFREG|0755, st_size=1820104, ...}) = 0
+mmap(NULL, 1832568, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 6, 0) = 0x7f7d6b05e000
+mprotect(0x7f7d6b083000, 1642496, PROT_NONE) = 0
+mmap(0x7f7d6b083000, 1339392, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x25000) = 0x7f7d6b083000
+mmap(0x7f7d6b1ca000, 299008, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x16c000) = 0x7f7d6b1ca000
+mmap(0x7f7d6b214000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x1b5000) = 0x7f7d6b214000
+mmap(0x7f7d6b21a000, 13944, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f7d6b21a000
+close(6)                                = 0
+openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libdl.so.2", O_RDONLY|O_CLOEXEC) = 6
+read(6, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0000\21\0\0\0\0\0\0"..., 832) = 832
+fstat(6, {st_mode=S_IFREG|0644, st_size=14592, ...}) = 0
+mmap(NULL, 16656, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 6, 0) = 0x7f7d6b059000
+mmap(0x7f7d6b05a000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x1000) = 0x7f7d6b05a000
+mmap(0x7f7d6b05b000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x2000) = 0x7f7d6b05b000
+mmap(0x7f7d6b05c000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 6, 0x2000) = 0x7f7d6b05c000
+close(6)                                = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f7d6b057000
+mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f7d6b054000
+arch_prctl(ARCH_SET_FS, 0x7f7d6b054740) = 0
+mprotect(0x7f7d6b214000, 12288, PROT_READ) = 0
+mprotect(0x7f7d6b05c000, 4096, PROT_READ) = 0
+mprotect(0x7f7d6b249000, 16384, PROT_READ) = 0
+mprotect(0x7f7d6b276000, 4096, PROT_READ) = 0
+mprotect(0x7f7d6b2c1000, 8192, PROT_READ) = 0
+mprotect(0x559e69df9000, 4096, PROT_READ) = 0
+mprotect(0x7f7d6b318000, 4096, PROT_READ) = 0
+munmap(0x7f7d6b2cd000, 144907)          = 0
+ioctl(0, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+brk(NULL)                               = 0x559e6a75a000
+brk(0x559e6a77b000)                     = 0x559e6a77b000
+rt_sigaction(SIGINT, {sa_handler=0x559e69de48a0, sa_mask=[INT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0x2), ...}) = 0
+write(1, "bc 1.07.1\n", 10bc 1.07.1
+)             = 10
+write(1, "Copyright 1991-1994, 1997, 1998,"..., 98Copyright 1991-1994, 1997, 1998, 2000, 2004, 2006, 2008, 2012-2017 Free Software Foundation, Inc.
+) = 98
+write(1, "This is free software with ABSOL"..., 51This is free software with ABSOLUTELY NO WARRANTY.
+) = 51
+write(1, "For details type `warranty'. \n", 30For details type `warranty'.
+) = 30
+ioctl(0, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+stat("/usr/local/google/home/ananduri/.terminfo", 0x559e6a769250) = -1 ENOENT (No such file or directory)
+stat("/etc/terminfo", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+stat("/lib/terminfo", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+stat("/usr/share/terminfo", {st_mode=S_IFDIR|0755, st_size=4096, ...}) = 0
+access("/etc/terminfo/x/xterm-256color", R_OK) = -1 ENOENT (No such file or directory)
+access("/lib/terminfo/x/xterm-256color", R_OK) = 0
+openat(AT_FDCWD, "/lib/terminfo/x/xterm-256color", O_RDONLY) = 6
+fstat(6, {st_mode=S_IFREG|0644, st_size=3503, ...}) = 0
+read(6, "\36\2%\0&\0\17\0\235\1\356\5xterm-256color|xterm"..., 32768) = 3503
+read(6, "", 28672)                      = 0
+close(6)                                = 0
+ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(1, TIOCGWINSZ, {ws_row=90, ws_col=180, ws_xpixel=0, ws_ypixel=0}) = 0
+ioctl(0, TIOCGWINSZ, {ws_row=90, ws_col=180, ws_xpixel=0, ws_ypixel=0}) = 0
+brk(0x559e6a79c000)                     = 0x559e6a79c000
+ioctl(0, TIOCGWINSZ, {ws_row=90, ws_col=180, ws_xpixel=0, ws_ypixel=0}) = 0
+ioctl(0, TIOCSWINSZ, {ws_row=90, ws_col=180, ws_xpixel=0, ws_ypixel=0}) = 0
+ioctl(0, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+openat(AT_FDCWD, "/usr/lib/locale/locale-archive", O_RDONLY|O_CLOEXEC) = 6
+fstat(6, {st_mode=S_IFREG|0644, st_size=3031632, ...}) = 0
+mmap(NULL, 3031632, PROT_READ, MAP_PRIVATE, 6, 0) = 0x7f7d6ad6f000
+close(6)                                = 0
+openat(AT_FDCWD, "/usr/local/google/home/ananduri/.inputrc", O_RDONLY) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/etc/inputrc", O_RDONLY) = 6
+fstat(6, {st_mode=S_IFREG|0644, st_size=2346, ...}) = 0
+read(6, "# $Id: //depot/google3/googledat"..., 2346) = 2346
+close(6)                                = 0
+ioctl(0, TIOCGWINSZ, {ws_row=90, ws_col=180, ws_xpixel=0, ws_ypixel=0}) = 0
+ioctl(0, TIOCSWINSZ, {ws_row=90, ws_col=180, ws_xpixel=0, ws_ypixel=0}) = 0
+ioctl(0, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(0, TCGETS, {B38400 opost isig icanon echo ...}) = 0
+ioctl(0, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig -icanon -echo ...}) = 0
+ioctl(0, TCGETS, {B38400 opost isig -icanon -echo ...}) = 0
+write(1, "\33[?2004h", 8)               = 8
+rt_sigprocmask(SIG_BLOCK, [HUP INT QUIT ALRM TERM TSTP TTIN TTOU], [], 8) = 0
+rt_sigaction(SIGINT, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=0x559e69de48a0, sa_mask=[INT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f7d6b098100}, 8) = 0
+rt_sigaction(SIGTERM, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGHUP, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGQUIT, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGALRM, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGTSTP, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGTTOU, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigaction(SIGTTIN, {sa_handler=0x7f7d6b2a7d60, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+rt_sigaction(SIGWINCH, {sa_handler=0x7f7d6b2a71f0, sa_mask=[], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f7d6b098100}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+brk(0x559e6a7bd000)                     = 0x559e6a7bd000
+pselect6(1, [0], NULL, NULL, NULL, {[], 8}
+
