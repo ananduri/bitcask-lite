@@ -373,8 +373,6 @@ int main(int argc, char* argv[]) {
     insert_hashmap(hashmap, key, offset);
     printf("read offset: %lld\n", offset);
   }
-  /* Is the way values are being written to file problematic... yes */
-
   
   Command command = {0};
   InputBuffer* input_buffer = new_input_buffer();
