@@ -363,6 +363,7 @@ int main(int argc, char* argv[]) {
       return 0;
     }
     int key;
+    printf("offset before break: %ld\n", ftell(segment_p)); // putting out 12. ?
     retval = fread(&key, size_k, 1, segment_p);
     printf("retval: %d\n", retval);    
     if (retval == 0) { // make a macro for this
