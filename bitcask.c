@@ -21,7 +21,8 @@
 typedef struct Node_t Node;
 struct Node_t {
   int key;
-  char value[VALUE_NUM_BYTES];  // this is probably not what we want right?
+  off_t offset;
+  //char value[VALUE_NUM_BYTES];  // this is probably not what we want right?
   Node* next_node;
 };
 
@@ -50,7 +51,8 @@ Node** create_hashmap() {
     array[i] = (Node*)malloc(sizeof(Node));
     array[i]->next_node = NULL;
     
-    strcpy(array[i]->value, "-1");
+    //strcpy(array[i]->offset, "-1");
+    array[i]->offset = -1;
   }
   return array;
 }
@@ -77,13 +79,13 @@ Node* get_bucket(Node** hashmap, int key) {
   return bucket_node;
 }
 
-void insert_hashmap(Node** hashmap, int key, char* value) {
+void insert_hashmap(Node** hashmap, int key, off_t offset) {
   Node* bucket_node = get_bucket(hashmap, key);
   
-  if (strcmp(bucket_node->value, "-1") == 0) {
+  if (bucket_node->offset == -1) {
     /* Do we need these two lines of code here? */
     bucket_node->key = key;
-    strcpy(bucket_node->value, value);
+    bucket_node->offset = offset;
     return;
   }
   
@@ -91,22 +93,22 @@ void insert_hashmap(Node** hashmap, int key, char* value) {
     Node* new_node = (Node*)malloc(sizeof(Node));
     bucket_node->next_node = new_node;
     new_node->key = key;
-    strcpy(bucket_node->value, value);
+    bucket_node->offset = offset;
     new_node->next_node = (Node*)malloc(sizeof(Node));
     return;
   }
   
   bucket_node->key = key;
-  strcpy(bucket_node->value, value);
+  bucket_node->offset = offset;
   bucket_node->next_node = (Node*)malloc(sizeof(Node));
 }
  
-char* get_hashmap(Node** hashmap, int key) {
+off_t get_from_hashmap(Node** hashmap, int key) {
   Node* bucket_node = get_bucket(hashmap, key);
-  if (bucket_node == NULL || strcmp(bucket_node->value, "-1") == 0) {
-    return NULL;
+  if (bucket_node == NULL || (bucket_node->offset == -1)) {
+    return -1;
   }
-  return bucket_node->value;
+  return bucket_node->offset;
 }
 
 void cleanup_hashmap() {
@@ -299,42 +301,45 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
 }
 
 ExecuteResult execute_command(Command* command, Node** hashmap) {
-  char* value;
+  // char* value; no
+  int offset;
   switch (command->type) {
     case SET: 
       if (strlen(command->keyvalue.value) > VALUE_NUM_BYTES) {
         return EXECUTE_ERROR;
       }
       int offset = append_to_segment(command->keyvalue);
-      //TODO: insert the offset in the file into the hashmap
       if (offset == -1) {
         return EXECUTE_ERROR;
       }
       printf("offset: %d\n", offset);
-      insert_hashmap(hashmap, command->keyvalue.key, (char*)&offset);
+      insert_hashmap(hashmap, command->keyvalue.key, offset);
       return EXECUTE_SUCCESS;
     case GET:
-      value = get_hashmap(hashmap, command->keyvalue.key);
-      if (value == NULL) {
+      // no. here you need to read from the file.
+      // in memory-hashmap only stores offsets into that file.
+      offset = get_from_hashmap(hashmap, command->keyvalue.key);
+      if (offset == -1) {
         return EXECUTE_ERROR;
       }
-      printf("%s\n", value);
+      printf("%d\n", offset);
+      // use offset to retrieve value from file
       return EXECUTE_SUCCESS;
     default:
       return EXECUTE_ERROR;
   }
 }
 
-int load_segment_into_memory(/*take file descriptor?*/) {
-  // open file and read
-}
+/* int load_segment_into_memory(/\*take file descriptor?*\/) { */
+/*   // open file and read */
+/* } */
 
 int main(int argc, char* argv[]) {
   Node** hashmap = create_hashmap();
 
   // check if a segment file exists on disk,
   // and if so, load that data into the in-memory hashmap.
-  FILE *segment_p;
+  FILE* segment_p;
   segment_p = fopen("segment0", "r");
   if (segment_p != NULL) {
     // assume starting at data for size of key, read that -> sk
@@ -344,35 +349,34 @@ int main(int argc, char* argv[]) {
     // then, next sk bytes, read and -> key
     // then, get offset after key, and -> value of hash table
     int retval;
-    int size_k;  // some confusion to be resolved here around the void*
-    retval = fread(/* (void*) */ &size_k, sizeof(sizeof(int)), 1, segment_p);
+    size_t size_k;  // some confusion to be resolved here around the void*
+    retval = fread(/* type:(void*) */ &size_k, sizeof(sizeof(int)), 1, segment_p);
     if (retval == 0) {
-      printf("error while reading segment file.");
+      printf("error while reading segment file1.");
       return 0;
     }
-    // does it seek automatically? is the offset stored in the FILE struct? yes
-    int size_v;
+    // does it seek automatically? is the offset stored in the FILE struct? A:yes
+    size_t size_v;
     retval = fread(&size_v, sizeof(int), 1, segment_p);
     if (retval == 0) {
-      printf("error while reading segment file.");
+      printf("error while reading segment file2.");
       return 0;
     }
     int key;
     retval = fread(&key, size_k, 1, segment_p);
-    if (retval == 0) {
-      printf("error while reading segment file.");
+    printf("retval: %d\n", retval);    
+    if (retval == 0) { // make a macro for this
+      printf("error while reading segment file3.");
       return 0;
     }
-    int offset = ftell(segment_p);
-
-    // shit... do i have the wrong types in the hashmap
+    off_t offset = ftell(segment_p);
     insert_hashmap(hashmap, key, offset);
+    printf("read offset: %lld\n", offset);
   }
   /* Is the way values are being written to file problematic... yes */
 
   
   Command command = {0};
-  //command.keyvalue.value = {0};
   InputBuffer* input_buffer = new_input_buffer();
   while (true) {
     print_prompt();
