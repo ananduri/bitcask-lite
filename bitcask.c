@@ -30,7 +30,7 @@ struct Node_t {
 #define NHASH 101  //prime near hash table capacity
 unsigned int hash(int key) {
   /* homemade shitty hash function */
-  unsigned int h = 0;
+  unsigned int h = 1;
   for (; key; key >>= 1) {
     h = MULT * h + (key & 1);
   }
@@ -69,8 +69,12 @@ Node** create_hashmap() {
  */
 Node* get_bucket(Node** hashmap, int key) {
   unsigned int h = hash(key);
+  printf("hash: %d\n", h);
   Node* bucket_node = hashmap[h];
-    
+  
+  // is this right? what if the bucket's key doesn't match but next
+  // node is null?
+  // it's ok, think we check in insert_hashmap
   while ((bucket_node->next_node != NULL) &&
       (bucket_node->key != key)) {
     bucket_node = bucket_node->next_node;
@@ -80,12 +84,14 @@ Node* get_bucket(Node** hashmap, int key) {
 }
 
 void insert_hashmap(Node** hashmap, int key, off_t offset) {
+  printf("insert_hashmap called with: key=%d, offset=%d\n", key, offset);
   Node* bucket_node = get_bucket(hashmap, key);
   
   if (bucket_node->offset == -1) {
     /* Do we need these two lines of code here? */
     bucket_node->key = key;
     bucket_node->offset = offset;
+    printf("bucket[key=%d, offset=%d]\n", key, offset);
     return;
   }
   
@@ -101,9 +107,11 @@ void insert_hashmap(Node** hashmap, int key, off_t offset) {
   bucket_node->key = key;
   bucket_node->offset = offset;
   bucket_node->next_node = (Node*)malloc(sizeof(Node));
+  printf("bucket[key=%d, offset=%d]\n", key, offset);
 }
  
 off_t get_from_hashmap(Node** hashmap, int key) {
+  printf("get_from_hashmap called: key=%d\n", key);
   Node* bucket_node = get_bucket(hashmap, key);
   if (bucket_node == NULL || (bucket_node->offset == -1)) {
     return -1;
@@ -165,7 +173,7 @@ struct Command_t {
 };
 typedef struct Command_t Command;
 
-int append_to_segment(KeyValue keyvalue) {
+off_t append_to_segment(KeyValue keyvalue) {
   /* for now, keep appending to the same file 
    * get the location where we started appending in the file 
    * need to append the key and the value, 
@@ -302,13 +310,13 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
 
 ExecuteResult execute_command(Command* command, Node** hashmap) {
   // char* value; no
-  int offset;
+  off_t offset;
   switch (command->type) {
     case SET: 
       if (strlen(command->keyvalue.value) > VALUE_NUM_BYTES) {
         return EXECUTE_ERROR;
       }
-      int offset = append_to_segment(command->keyvalue);
+      offset = append_to_segment(command->keyvalue);
       if (offset == -1) {
         return EXECUTE_ERROR;
       }
@@ -322,7 +330,7 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       if (offset == -1) {
         return EXECUTE_ERROR;
       }
-      printf("%d\n", offset);
+      printf("remembered offset is: %d\n", offset);
       // use offset to retrieve value from file
       return EXECUTE_SUCCESS;
     default:
@@ -341,45 +349,52 @@ int main(int argc, char* argv[]) {
   // and if so, load that data into the in-memory hashmap.
   FILE* segment_p;
   segment_p = fopen("segment0", "r");
+  
+  int retval;
+  retval = fseek(segment_p, 0, SEEK_END);
+  if (retval != 0) {
+    printf("error while reading segment file\n.");
+  }
+  off_t offset_end = ftell(segment_p);
+  retval = fseek(segment_p, 0, SEEK_SET);
+  if (retval != 0) {
+    printf("error while reading segment file\n.");
+  }
+
   if (segment_p != NULL) {
-    // assume starting at data for size of key, read that -> sk
-    //   need to know the size of the data for the size of the key
-    //   we know it is sizeof(int) which is...
-    // then read size of value -> sv
-    // then, next sk bytes, read and -> key
-    // then, get offset after key, and -> value of hash table
-    int retval;
-    size_t size_k;  // some confusion to be resolved here around the void*
-    retval = fread(/* type:(void*) */ &size_k, sizeof(int), 1, segment_p);
-    //retval = fread(/* type:(void*) */ &size_k, 1, 1, segment_p);
-    if (retval == 0) {
-      printf("error while reading segment file1\n.");
-      return 0;
+    // could just keep updating an int with the offset
+    while (ftell(segment_p) != offset_end) {
+      // assume starting at data for size of key, read that -> sk
+      //   need to know the size of the data for the size of the key
+      //   we know it is sizeof(int) which is...
+      // then jump by size of value
+      // then, next sk bytes, read and -> key of hash table
+      // then, get offset after key, and -> value of hash table
+      size_t size_k;
+      retval = fread(&size_k, sizeof(int), 1, segment_p);
+      if (retval == 0) {
+        printf("error while reading segment file1\n");
+        return 0;
+      }    
+      fseek(segment_p, sizeof(VALUE_NUM_BYTES), SEEK_CUR);
+
+      int key;
+      retval = fread(&key, size_k, 1, segment_p);
+      if (retval == 0) { // make a macro for this
+        printf("error while reading segment file3\n");
+        return 0;
+      }
+      off_t offset = ftell(segment_p);
+      printf("read offset: %lld\n", offset);
+      insert_hashmap(hashmap, key, offset);
+      
+      // is it okay to fseek past the end of the file?
+      retval = fseek(segment_p, VALUE_NUM_BYTES, SEEK_CUR);
+      if (retval != 0) { // make a macro for this
+        printf("error while seeking in file\n");
+        return 0;
+      }
     }
-    
-    // i dont actually need size_v here...
-    // i will in the GET but not here
-    size_t size_v;
-    // size_v should not be 1
-    printf("offset before read of size_v: %ld\n", ftell(segment_p));
-    retval = fread(&size_v, sizeof(VALUE_NUM_BYTES), 1, segment_p);
-    if (retval == 0) {
-      printf("error while reading segment file2\n.");
-      return 0;
-    }
-    int key;
-    printf("offset before break: %ld\n", ftell(segment_p));
-    printf("size_k: %zu\n", size_k);
-    printf("size_v: %zu\n", size_v);
-    retval = fread(&key, size_k, 1, segment_p);
-    printf("retval: %d\n", retval);
-    if (retval == 0) { // make a macro for this
-      printf("error while reading segment file3\n.");
-      return 0;
-    }
-    off_t offset = ftell(segment_p);
-    insert_hashmap(hashmap, key, offset);
-    printf("read offset: %lld\n", offset);
   }
   
   Command command = {0};
