@@ -36,3 +36,11 @@ since it copies over the entire buffer (command.keyvalue.value).
 Current question:
 Why is only 1 byte written with 04 at the beginning of the file?
 It's good, but I don't get why it's happening (and not 8 bytes).
+
+
+new error message:
+
+bitcask-lite> get 2
+bc(28809,0x1053165c0) malloc: *** error for object 0x61: pointer being realloc'd was not allocated
+bc(28809,0x1053165c0) malloc: *** set a breakpoint in malloc_error_break to debug
+Abort trap: 6

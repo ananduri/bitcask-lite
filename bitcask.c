@@ -69,7 +69,7 @@ Node** create_hashmap() {
  */
 Node* get_bucket(Node** hashmap, int key) {
   unsigned int h = hash(key);
-  printf("hash: %d\n", h);
+  //printf("hash: %d\n", h);
   Node* bucket_node = hashmap[h];
   
   // is this right? what if the bucket's key doesn't match but next
@@ -84,14 +84,14 @@ Node* get_bucket(Node** hashmap, int key) {
 }
 
 void insert_hashmap(Node** hashmap, int key, off_t offset) {
-  printf("insert_hashmap called with: key=%d, offset=%d\n", key, offset);
+  //printf("insert_hashmap called with: key=%d, offset=%d\n", key, offset);
   Node* bucket_node = get_bucket(hashmap, key);
   
   if (bucket_node->offset == -1) {
     /* Do we need these two lines of code here? */
     bucket_node->key = key;
     bucket_node->offset = offset;
-    printf("bucket[key=%d, offset=%d]\n", key, offset);
+    //printf("bucket[key=%d, offset=%d]\n", key, offset);
     return;
   }
   
@@ -107,11 +107,10 @@ void insert_hashmap(Node** hashmap, int key, off_t offset) {
   bucket_node->key = key;
   bucket_node->offset = offset;
   bucket_node->next_node = (Node*)malloc(sizeof(Node));
-  printf("bucket[key=%d, offset=%d]\n", key, offset);
+  //printf("bucket[key=%d, offset=%d]\n", key, offset);
 }
  
 off_t get_from_hashmap(Node** hashmap, int key) {
-  printf("get_from_hashmap called: key=%d\n", key);
   Node* bucket_node = get_bucket(hashmap, key);
   if (bucket_node == NULL || (bucket_node->offset == -1)) {
     return -1;
@@ -231,8 +230,10 @@ off_t append_to_segment(KeyValue keyvalue) {
   
 
 void read_input(InputBuffer* input_buffer) {
+  //printf("x\n");
   ssize_t bytes_read = getline(&(input_buffer->buffer), 
                                &(input_buffer->buffer_length), stdin);
+  printf("xx\n");
   
   if (bytes_read <= 0) {
     printf("Error reading input\n");
@@ -324,6 +325,7 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       insert_hashmap(hashmap, command->keyvalue.key, offset);
       return EXECUTE_SUCCESS;
     case GET:
+      printf("case statement entered.\n");
       // no. here you need to read from the file.
       // in memory-hashmap only stores offsets into that file.
       offset = get_from_hashmap(hashmap, command->keyvalue.key);
@@ -332,6 +334,26 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       }
       printf("remembered offset is: %d\n", offset);
       // use offset to retrieve value from file
+      FILE* segment_p;
+      segment_p = fopen("segment0", "r");
+      if (segment_p == NULL) {
+        printf("segment file not found upon GET.\n");
+        return EXECUTE_ERROR;
+      }
+      int retval;
+      retval = fseek(segment_p, offset, SEEK_SET);
+      if (retval != 0) {
+        printf("error while reading segment file\n.");
+      }
+      char* value;
+      retval = fread(value, VALUE_NUM_BYTES, 1, segment_p);
+      if (retval == 0) {
+        printf("error while reading segment file\n");
+        return 0;
+      }
+      // do i need to reset the offset after the read?
+      
+      printf("retrieved value: %s\n", value);
       return EXECUTE_SUCCESS;
     default:
       return EXECUTE_ERROR;
@@ -349,6 +371,10 @@ int main(int argc, char* argv[]) {
   // and if so, load that data into the in-memory hashmap.
   FILE* segment_p;
   segment_p = fopen("segment0", "r");
+  if (segment_p == NULL) {
+    printf("segment file not found.\n");
+    // ATTN: need to skip the loading of the file.
+  }
   
   int retval;
   retval = fseek(segment_p, 0, SEEK_END);
@@ -375,7 +401,7 @@ int main(int argc, char* argv[]) {
       if (retval == 0) {
         printf("error while reading segment file1\n");
         return 0;
-      }    
+      }
       fseek(segment_p, sizeof(VALUE_NUM_BYTES), SEEK_CUR);
 
       int key;
@@ -402,6 +428,7 @@ int main(int argc, char* argv[]) {
   while (true) {
     print_prompt();
     read_input(input_buffer); //puts input in the buffer of input_buffer
+    printf("input successfully read.\n");
         
     switch (process_command(input_buffer, &command)) {
       case PROCESS_SUCCESS:
