@@ -350,24 +350,31 @@ int main(int argc, char* argv[]) {
     // then, get offset after key, and -> value of hash table
     int retval;
     size_t size_k;  // some confusion to be resolved here around the void*
-    retval = fread(/* type:(void*) */ &size_k, sizeof(sizeof(int)), 1, segment_p);
+    retval = fread(/* type:(void*) */ &size_k, sizeof(int), 1, segment_p);
+    //retval = fread(/* type:(void*) */ &size_k, 1, 1, segment_p);
     if (retval == 0) {
-      printf("error while reading segment file1.");
+      printf("error while reading segment file1\n.");
       return 0;
     }
-    // does it seek automatically? is the offset stored in the FILE struct? A:yes
+    
+    // i dont actually need size_v here...
+    // i will in the GET but not here
     size_t size_v;
-    retval = fread(&size_v, sizeof(int), 1, segment_p);
+    // size_v should not be 1
+    printf("offset before read of size_v: %ld\n", ftell(segment_p));
+    retval = fread(&size_v, sizeof(VALUE_NUM_BYTES), 1, segment_p);
     if (retval == 0) {
-      printf("error while reading segment file2.");
+      printf("error while reading segment file2\n.");
       return 0;
     }
     int key;
-    printf("offset before break: %ld\n", ftell(segment_p)); // putting out 12. ?
+    printf("offset before break: %ld\n", ftell(segment_p));
+    printf("size_k: %zu\n", size_k);
+    printf("size_v: %zu\n", size_v);
     retval = fread(&key, size_k, 1, segment_p);
-    printf("retval: %d\n", retval);    
+    printf("retval: %d\n", retval);
     if (retval == 0) { // make a macro for this
-      printf("error while reading segment file3.");
+      printf("error while reading segment file3\n.");
       return 0;
     }
     off_t offset = ftell(segment_p);
