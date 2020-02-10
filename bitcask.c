@@ -230,10 +230,8 @@ off_t append_to_segment(KeyValue keyvalue) {
   
 
 void read_input(InputBuffer* input_buffer) {
-  //printf("x\n");
   ssize_t bytes_read = getline(&(input_buffer->buffer), 
                                &(input_buffer->buffer_length), stdin);
-  printf("xx\n");
   
   if (bytes_read <= 0) {
     printf("Error reading input\n");
@@ -325,9 +323,6 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       insert_hashmap(hashmap, command->keyvalue.key, offset);
       return EXECUTE_SUCCESS;
     case GET:
-      printf("case statement entered.\n");
-      // no. here you need to read from the file.
-      // in memory-hashmap only stores offsets into that file.
       offset = get_from_hashmap(hashmap, command->keyvalue.key);
       if (offset == -1) {
         return EXECUTE_ERROR;
@@ -353,7 +348,7 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       }
       // do i need to reset the offset after the read?
       
-      printf("retrieved value: %s\n", value);
+      printf("retrieved: %s\n", value);
       return EXECUTE_SUCCESS;
     default:
       return EXECUTE_ERROR;
@@ -411,7 +406,6 @@ int main(int argc, char* argv[]) {
         return 0;
       }
       off_t offset = ftell(segment_p);
-      printf("read offset: %lld\n", offset);
       insert_hashmap(hashmap, key, offset);
       
       // is it okay to fseek past the end of the file?
@@ -428,7 +422,6 @@ int main(int argc, char* argv[]) {
   while (true) {
     print_prompt();
     read_input(input_buffer); //puts input in the buffer of input_buffer
-    printf("input successfully read.\n");
         
     switch (process_command(input_buffer, &command)) {
       case PROCESS_SUCCESS:
