@@ -173,20 +173,19 @@ struct Command_t {
 typedef struct Command_t Command;
 
 off_t append_to_segment(KeyValue keyvalue) {
-  /* for now, keep appending to the same file 
-   * get the location where we started appending in the file 
-   * need to append the key and the value, 
-   * to check if this is the right keyvalue and therefore the right file later on, 
+  /* for now, keep appending to the same file.
+   *   
+   * need to append both the key and the value, 
+   * to check if this is the right keyvalue
+   * and therefore the right file later on, 
    * when we have multiple files */
-  int offset;
-  FILE* pfile;
-  pfile = fopen("segment0", "ab");
-  if (pfile == NULL) {
+  FILE* segment_p;
+  segment_p = fopen("segment0", "ab");
+  if (segment_p == NULL) {
     perror ("Error opening file");
-    offset = -1; 
-    return offset;
+    return -1;
   }
-  offset = ftell(pfile); //does this do anything?
+  off_t offset = ftell(segment_p); // switch to this
 
   //first write the length of the keyvalue in bytes,
   //then write the keyvalue itself.
@@ -194,37 +193,34 @@ off_t append_to_segment(KeyValue keyvalue) {
   //
   //write the following:
   //1. size of the key
-  int retval = putw(sizeof(int), pfile);
-  //int retval = fwrite(sizeof(int), sizeof(sizeof(int)), 1, pfile);
+  int retval = putw(sizeof(int), segment_p);
+  //int retval = fwrite(sizeof(int), sizeof(sizeof(int)), 1, segment_p);
   if (retval != 0) {
     perror ("Error opening file");
-    offset = -1;
-    return offset;
+    return -1;
   }
   //2. size of the value
-  //retval = fwrite(VALUE_NUM_BYTES, sizeof(uint32_t), 1, pfile);
-  retval = putw(VALUE_NUM_BYTES, pfile);
+  //retval = fwrite(VALUE_NUM_BYTES, sizeof(uint32_t), 1, segment_p);
+  retval = putw(VALUE_NUM_BYTES, segment_p);
   if (retval != 0) {
     perror ("Error opening file");
-    offset = -1;
-    return offset;
+    return -1;
   }
   //3. key
-  retval = fwrite(&keyvalue.key, sizeof(int), 1, pfile);
+  retval = fwrite(&keyvalue.key, sizeof(int), 1, segment_p);
   if (retval != 1) {
     perror ("Error opening file");
-    offset = -1; 
-    return offset;
+    return -1;
   }
+  //off_t offset = ftell(segment_p);
   //4. value
-  retval = fwrite(&keyvalue.value, VALUE_NUM_BYTES, 1, pfile);
+  retval = fwrite(&keyvalue.value, VALUE_NUM_BYTES, 1, segment_p);
   if (retval != 1) {
     perror ("Error opening file");
-    offset = -1; 
-    return offset;
+    return -1;
   }
 
-  fclose(pfile);
+  fclose(segment_p);
   return offset;
 }
   
@@ -254,7 +250,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
   } else if (strncmp(input_buffer->buffer, "set ", 4) == 0) {
     command->type = SET;
     
-    //this keyword var is not used
+    //this keyword var is not used; can I just call the function without the lvalue?
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
@@ -289,7 +285,7 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
   } else if (strncmp(input_buffer->buffer, "get ", 4) == 0) {
     command->type = GET;
     
-    //keyword is not used
+    //keyword is not used; can I just call the function without the lvalue?
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
@@ -308,7 +304,6 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
 }
 
 ExecuteResult execute_command(Command* command, Node** hashmap) {
-  // char* value; no
   off_t offset;
   switch (command->type) {
     case SET: 
@@ -319,7 +314,7 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       if (offset == -1) {
         return EXECUTE_ERROR;
       }
-      printf("offset: %d\n", offset);
+      printf("offset: %ld\n", offset);
       insert_hashmap(hashmap, command->keyvalue.key, offset);
       return EXECUTE_SUCCESS;
     case GET:
@@ -327,23 +322,49 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       if (offset == -1) {
         return EXECUTE_ERROR;
       }
-      printf("remembered offset is: %d\n", offset);
-      // use offset to retrieve value from file
+      printf("remembered offset is: %ld\n", offset);
       FILE* segment_p;
       segment_p = fopen("segment0", "r");
       if (segment_p == NULL) {
         printf("segment file not found upon GET.\n");
         return EXECUTE_ERROR;
       }
+      // [Refactor below, reading from file]
+      // Reading value directly from file here.
+      // May need to read the size of the value, and then the value.
+      // Actually, need to read the key as well, to compare with the input
+      // and for that, need the size of the key as well.
       int retval;
       retval = fseek(segment_p, offset, SEEK_SET);
       if (retval != 0) {
-        printf("error while reading segment file\n.");
+        printf("error while seeking segment file\n.");
       }
-      char* value[VALUE_NUM_BYTES] = {0};
-      retval = fread(value, VALUE_NUM_BYTES, 1, segment_p);
+      size_t size_k;
+      retval = fread(&size_k, sizeof(int), 1, segment_p);
       if (retval == 0) {
-        printf("error while reading segment file\n");
+        printf("error while reading segment file1\n");
+        return 0;
+      }
+      size_t size_v;
+      retval = fread(&size_v, sizeof(VALUE_NUM_BYTES), 1, segment_p);
+      if (retval == 0) {
+        printf("error while reading segment file2\n");
+        return 0;
+      }
+      printf("size_k: %d\n", size_k);
+      int read_key;
+      retval = fread(&read_key, size_k, 1, segment_p);
+      if (retval == 0) {
+        printf("error while reading segment file3\n");
+        return 0;
+      }
+      // compare read key with supplied key
+      char value[VALUE_NUM_BYTES] = {0};
+      printf("size_v: %ld\n", size_v);
+      retval = fread(value, size_v, 1, segment_p); // why is the arg wrong??
+      //retval = fread(value, 25, 1, segment_p); // why does this line work but not the above?
+      if (retval == 0) {
+        printf("error while reading segment file4\n");
         return 0;
       }
       // do i need to reset the offset after the read?
@@ -384,7 +405,8 @@ int main(int argc, char* argv[]) {
 
   if (segment_p != NULL) {
     // could just keep updating an int with the offset
-    while (ftell(segment_p) != offset_end) {
+    while (ftell(segment_p) < offset_end) {
+      off_t offset = ftell(segment_p);
       // assume starting at data for size of key, read that -> sk
       //   need to know the size of the data for the size of the key
       //   we know it is sizeof(int) which is...
@@ -405,7 +427,6 @@ int main(int argc, char* argv[]) {
         printf("error while reading segment file3\n");
         return 0;
       }
-      off_t offset = ftell(segment_p);
       insert_hashmap(hashmap, key, offset);
       
       // is it okay to fseek past the end of the file?

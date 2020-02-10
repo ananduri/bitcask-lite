@@ -44,3 +44,66 @@ bitcask-lite> get 2
 bc(28809,0x1053165c0) malloc: *** error for object 0x61: pointer being realloc'd was not allocated
 bc(28809,0x1053165c0) malloc: *** set a breakpoint in malloc_error_break to debug
 Abort trap: 6
+
+^Above was likely b/c I was writing to a char* that was not initialized.
+(Exactly why is that error produced, why is it wrong?)
+
+
+Current problem:
+If a value is inserted, it isn't displayed upon being retrieved in the same session.
+
+The offset is wrong
+
+
+It's when you're uncertain about things
+at two different levels of abstraction
+that things get difficult (and you make mistakes).
+
+
+
+Problem while reading:
+strace: (not as useful b/c reads are buffered)
+read(0, "get 1\n", 1024)                = 6
+write(1, "remembered offset is: 0\n", 24) = 24
+openat(AT_FDCWD, "segment0", O_RDONLY)  = 7
+fstat(7, {st_mode=S_IFREG|0644, st_size=148, ...}) = 0
+lseek(7, 0, SEEK_SET)                   = 0
+read(7, "\4\0\0\0\31\0\0\0\1\0\0\0a\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 4096) = 148
+write(1, "size_v: 25\n", 11)            = 11
+read(7, 0x7ffdc4b6fa68, 94523640246272) = -1 EFAULT (Bad address)
+write(1, "error while reading segment file"..., 34) = 34
+--- SIGSEGV {si_signo=SIGSEGV, si_code=SEGV_MAPERR, si_addr=NULL} ---
++++ killed by SIGSEGV +++
+
+ltrace: (useful)
+strcmp("get 1", ".exit")                                                                                       = 57
+strncmp("get 1", "set ", 4)                                                                                    = -12
+strncmp("get 1", "get ", 4)                                                                                    = 0
+strtok("get 1", " ")                                                                                           = "get"
+strtok(nil, " ")                                                                                               = "1"
+atoi(0x5634572f48a4, 4, 12, 1)                                                                                 = 1
+printf("remembered offset is: %ld\n", 0)                                                                       = 24
+fopen("segment0", "r")                                                                                         = 0x5634572f4d30
+fseek(0x5634572f4d30, 0, 0, 0)                                                                                 = 0
+fread(0x7ffc0e847990, 4, 1, 0x5634572f4d30)                                                                    = 1
+fread(0x7ffc0e847988, 4, 1, 0x5634572f4d30)                                                                    = 1
+printf("size_k: %d\n", 4)                                                                                      = 10
+fread(0x7ffc0e847984, 4, 1, 0x5634572f4d30)                                                                    = 1
+printf("size_v: %d\n", 25)                                                                                     = 11
+fread(0x7ffc0e847960, 94781338288153, 1, 0x5634572f4d30)                                                       = 0
+puts("error while reading segment file"...)                                                                    = 34
+--- SIGSEGV (Segmentation fault) ---
++++ killed by SIGSEGV +++
+
+The last read, the second arg is wrong. Why? I am printing it out right before.
+
+
+Can I learn to examine the assembly code?
+
+Can you trace the assembly, just like you can trace system calls?
+gdb does this
+
+
+Okay, lesson learned, actually pay atention to the warnings that tell you to use the appropriate printf format things for various things like size_t.
+
+size_t is being read incorrectly.
