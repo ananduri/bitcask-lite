@@ -107,3 +107,9 @@ gdb does this
 Okay, lesson learned, actually pay atention to the warnings that tell you to use the appropriate printf format things for various things like size_t.
 
 size_t is being read incorrectly.
+
+is it b/c it's not initialized?
+and only the low-order bits are being written?
+
+
+Eventually use TSAN and ASAN on the binary.
