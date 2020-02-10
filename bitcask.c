@@ -345,7 +345,7 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       if (retval != 0) {
         printf("error while reading segment file\n.");
       }
-      char* value;
+      char* value[VALUE_NUM_BYTES] = {0};
       retval = fread(value, VALUE_NUM_BYTES, 1, segment_p);
       if (retval == 0) {
         printf("error while reading segment file\n");
