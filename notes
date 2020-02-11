@@ -119,3 +119,19 @@ make sure you initialize them,
 or garbage bytes could end up making them wrong/really big.
 
 Eventually use TSAN and ASAN on the binary.
+
+
+So overwriting the keyvalue (using same key but different value) already works?
+
+Yes, because the file is read forward, so the most recent offset for the key is always stored into the hashmap last.
+
+
+Keeping a singleton hashmap around in the program? That's the best way right? Should I make it more explicit?
+
+
+Get feedback on this somehow? The current prototype version.
+Who would be really good. I don't trust random redditors/internet people.
+
+
+Is return -1 in main() equiv. to exit(EXIT_FAILURE) ?
+same for return 0 and exit(EXIT_SUCCESS)

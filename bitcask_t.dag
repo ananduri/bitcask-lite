@@ -40,7 +40,7 @@
   Write the things inside the structs, not the struct itself)
   Code: focus on the `append_to_segment` function)
   
- (Include code for variable-sized values--this has to be done, actually)
+ (Include code for variable-sized values--this has to be done, actually. But when?)
  
 
 

@@ -22,14 +22,13 @@ typedef struct Node_t Node;
 struct Node_t {
   int key;
   off_t offset;
-  //char value[VALUE_NUM_BYTES];  // this is probably not what we want right?
   Node* next_node;
 };
 
 #define MULT 31  //effective multiplier (according to Bentley)
 #define NHASH 101  //prime near hash table capacity
 unsigned int hash(int key) {
-  /* homemade shitty hash function */
+  /* homemade bad hash function */
   unsigned int h = 1;
   for (; key; key >>= 1) {
     h = MULT * h + (key & 1);
@@ -51,7 +50,6 @@ Node** create_hashmap() {
     array[i] = (Node*)malloc(sizeof(Node));
     array[i]->next_node = NULL;
     
-    //strcpy(array[i]->offset, "-1");
     array[i]->offset = -1;
   }
   return array;
@@ -187,20 +185,14 @@ off_t append_to_segment(KeyValue keyvalue) {
   }
   off_t offset = ftell(segment_p); // switch to this
 
-  //first write the length of the keyvalue in bytes,
-  //then write the keyvalue itself.
-  //isn't sizeof(KeyValue) a constant? 
-  //
-  //write the following:
+  //Write the following:
   //1. size of the key
   int retval = putw(sizeof(int), segment_p);
-  //int retval = fwrite(sizeof(int), sizeof(sizeof(int)), 1, segment_p);
   if (retval != 0) {
     perror ("Error opening file");
     return -1;
   }
   //2. size of the value
-  //retval = fwrite(VALUE_NUM_BYTES, sizeof(uint32_t), 1, segment_p);
   retval = putw(VALUE_NUM_BYTES, segment_p);
   if (retval != 0) {
     perror ("Error opening file");
@@ -212,7 +204,6 @@ off_t append_to_segment(KeyValue keyvalue) {
     perror ("Error opening file");
     return -1;
   }
-  //off_t offset = ftell(segment_p);
   //4. value
   retval = fwrite(&keyvalue.value, VALUE_NUM_BYTES, 1, segment_p);
   if (retval != 1) {
@@ -234,7 +225,7 @@ void read_input(InputBuffer* input_buffer) {
     exit(EXIT_FAILURE);
   }
   
-  //get rid of trailing newline
+  // We are subtracting 1 in order to get rid of trailing newline.
   input_buffer->buffer[bytes_read - 1] = 0;
   input_buffer->input_length = bytes_read - 1;
 }
@@ -254,16 +245,8 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
     char* keyword = strtok(input_buffer->buffer, " ");
     char* key_string = strtok(NULL, " ");
     int key = atoi(key_string);
-
     char* value = strtok(NULL, " ");
-    // print out contents of this value char array
-    /* while (pointer is not terminating null byte) { */
-    /*   print what value points to; */
-    /*   advance value by 4 bytes (char value); */
-    /* } */
-    
     if (key_string == NULL || value == NULL) {
-      //return error
       return PROCESS_ERROR;
     }
     
@@ -359,13 +342,11 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       }
       // compare read key with supplied key
       char value[VALUE_NUM_BYTES] = {0};
-      retval = fread(value, size_v, 1, segment_p); // why is the arg wrong??
-      //retval = fread(value, 25, 1, segment_p); // why does this line work but not the above?
+      retval = fread(value, size_v, 1, segment_p);
       if (retval == 0) {
         printf("error while reading segment file4\n");
         return 0;
       }
-      // do i need to reset the offset after the read?
       
       printf("retrieved: %s\n", value);
       return EXECUTE_SUCCESS;
@@ -374,9 +355,49 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
   }
 }
 
-/* int load_segment_into_memory(/\*take file descriptor?*\/) { */
-/*   // open file and read */
-/* } */
+int load_segment_into_memory(FILE* segment_p, Node** hashmap) {
+  int retval;
+  retval = fseek(segment_p, 0, SEEK_END);
+  if (retval != 0) {
+    printf("error while reading segment file\n.");
+    return -1;
+  }
+  off_t offset_end = ftell(segment_p);
+  retval = fseek(segment_p, 0, SEEK_SET);
+  if (retval != 0) {
+    printf("error while reading segment file\n.");
+    return -1;
+  }
+
+  if (segment_p != NULL) {
+    // could just keep updating an int with the offset
+    while (ftell(segment_p) < offset_end) {
+      off_t offset = ftell(segment_p);
+      size_t size_k;
+      retval = fread(&size_k, sizeof(int), 1, segment_p);
+      if (retval == 0) {
+        printf("error while reading segment file\n");
+        return -1;
+      }
+      fseek(segment_p, sizeof(VALUE_NUM_BYTES), SEEK_CUR);
+
+      int key;
+      retval = fread(&key, size_k, 1, segment_p);
+      if (retval == 0) {
+        printf("error while reading segment file\n");
+        return -1;
+      }
+      insert_hashmap(hashmap, key, offset);
+      
+      retval = fseek(segment_p, VALUE_NUM_BYTES, SEEK_CUR);
+      if (retval != 0) { // make a macro for this
+        printf("error while seeking in file\n");
+        return -1;
+      }
+    }
+  }
+  return 0;
+}
 
 int main(int argc, char* argv[]) {
   Node** hashmap = create_hashmap();
@@ -385,54 +406,10 @@ int main(int argc, char* argv[]) {
   // and if so, load that data into the in-memory hashmap.
   FILE* segment_p;
   segment_p = fopen("segment0", "r");
-  if (segment_p == NULL) {
-    printf("segment file not found.\n");
-    // ATTN: need to skip the loading of the file.
-  }
-  
-  int retval;
-  retval = fseek(segment_p, 0, SEEK_END);
-  if (retval != 0) {
-    printf("error while reading segment file\n.");
-  }
-  off_t offset_end = ftell(segment_p);
-  retval = fseek(segment_p, 0, SEEK_SET);
-  if (retval != 0) {
-    printf("error while reading segment file\n.");
-  }
-
   if (segment_p != NULL) {
-    // could just keep updating an int with the offset
-    while (ftell(segment_p) < offset_end) {
-      off_t offset = ftell(segment_p);
-      // assume starting at data for size of key, read that -> sk
-      //   need to know the size of the data for the size of the key
-      //   we know it is sizeof(int) which is...
-      // then jump by size of value
-      // then, next sk bytes, read and -> key of hash table
-      // then, get offset after key, and -> value of hash table
-      size_t size_k;
-      retval = fread(&size_k, sizeof(int), 1, segment_p);
-      if (retval == 0) {
-        printf("error while reading segment file1\n");
-        return 0;
-      }
-      fseek(segment_p, sizeof(VALUE_NUM_BYTES), SEEK_CUR);
-
-      int key;
-      retval = fread(&key, size_k, 1, segment_p);
-      if (retval == 0) { // make a macro for this
-        printf("error while reading segment file3\n");
-        return 0;
-      }
-      insert_hashmap(hashmap, key, offset);
-      
-      // is it okay to fseek past the end of the file?
-      retval = fseek(segment_p, VALUE_NUM_BYTES, SEEK_CUR);
-      if (retval != 0) { // make a macro for this
-        printf("error while seeking in file\n");
-        return 0;
-      }
+    int retval = load_segment_into_memory(segment_p, hashmap);
+    if (retval != 0) {
+      return -1;
     }
   }
   
@@ -440,7 +417,7 @@ int main(int argc, char* argv[]) {
   InputBuffer* input_buffer = new_input_buffer();
   while (true) {
     print_prompt();
-    read_input(input_buffer); //puts input in the buffer of input_buffer
+    read_input(input_buffer);
         
     switch (process_command(input_buffer, &command)) {
       case PROCESS_SUCCESS:
