@@ -111,5 +111,11 @@ size_t is being read incorrectly.
 is it b/c it's not initialized?
 and only the low-order bits are being written?
 
+Yes, that's exactly what happened.
+
+If declaring variables of a potentially bigger type,
+and you're using them or writing to them with functions that treat them as ints or types with a smaller width,
+make sure you initialize them,
+or garbage bytes could end up making them wrong/really big.
 
 Eventually use TSAN and ASAN on the binary.

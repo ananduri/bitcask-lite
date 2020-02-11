@@ -339,19 +339,18 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       if (retval != 0) {
         printf("error while seeking segment file\n.");
       }
-      size_t size_k;
+      size_t size_k = 0;
       retval = fread(&size_k, sizeof(int), 1, segment_p);
       if (retval == 0) {
         printf("error while reading segment file1\n");
         return 0;
       }
-      size_t size_v;
+      size_t size_v = 0;
       retval = fread(&size_v, sizeof(VALUE_NUM_BYTES), 1, segment_p);
       if (retval == 0) {
         printf("error while reading segment file2\n");
         return 0;
       }
-      printf("size_k: %d\n", size_k);
       int read_key;
       retval = fread(&read_key, size_k, 1, segment_p);
       if (retval == 0) {
@@ -360,7 +359,6 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
       }
       // compare read key with supplied key
       char value[VALUE_NUM_BYTES] = {0};
-      printf("size_v: %ld\n", size_v);
       retval = fread(value, size_v, 1, segment_p); // why is the arg wrong??
       //retval = fread(value, 25, 1, segment_p); // why does this line work but not the above?
       if (retval == 0) {
