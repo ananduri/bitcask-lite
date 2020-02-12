@@ -420,6 +420,8 @@ int load_segment_into_memory(FILE* segment_p, Node** hashmap) {
 int main(int argc, char* argv[]) {
   Node** hashmap = create_hashmap();
 
+  // read max segment ID from ID file; if doesn't exist, create it
+
   // check if a segment file exists on disk,
   // and if so, load that data into the in-memory hashmap.
   FILE* segment_p;
