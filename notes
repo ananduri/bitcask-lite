@@ -145,3 +145,15 @@ ssize_t is a signed version of this.
 
 Next, learn how to read the disassembled output.
 elf files? x86 assembly? linkers?
+
+
+
+Need to fclose the stream at some point.
+
+
+How big does a size_t have to get before it fucks shit up by being treated as ssize_t?
+-> write some simple programs to verify this
+if size_t is 8 bytes (verify), then as soon as it goes over 2^(31) it should get negative.
+
+do i expect any files to be of size 2^31? other way around, that is an upper bound for the segment file size.
+this is ~2GB (or exactly 2 GiB)

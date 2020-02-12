@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 /* 
  * Data layout of the segment file
@@ -284,6 +285,20 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
     printf("Unrecognized command '%s'\n", input_buffer->buffer);
     return PROCESS_ERROR;
   }
+}
+
+off_t get_file_size(FILE* segment_p) {
+  int fd = fileno(segment_p);
+  if (fd == -1) {
+    printf("error when getting file descriptor\n");
+    return -1;
+  }
+  struct stat sb;
+  if (fstat(fd, &sb) == -1) {
+    perror("fstat");  // another style of erroring out?
+    return -1;
+  }
+  return sb.st_size;
 }
 
 int get_value_from_segment(FILE* segment_p, off_t offset, char* value) {
