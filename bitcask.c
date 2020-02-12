@@ -286,6 +286,43 @@ ProcessResult process_command(InputBuffer* input_buffer, Command* command) {
   }
 }
 
+int get_value_from_segment(FILE* segment_p, off_t offset, char* value) {
+  // Reading value directly from file here.
+  // May need to read the size of the value, and then the value.
+  // Actually, need to read the key as well, to compare with the input
+  // and for that, need the size of the key as well.
+  int retval;
+  retval = fseek(segment_p, offset, SEEK_SET);
+  if (retval != 0) {
+    printf("error while seeking segment file\n.");
+  }
+  size_t size_k = 0;
+  retval = fread(&size_k, sizeof(int), 1, segment_p);
+  if (retval == 0) {
+    printf("error while reading segment file1\n");
+    return -1;
+  }
+  size_t size_v = 0;
+  retval = fread(&size_v, sizeof(VALUE_NUM_BYTES), 1, segment_p);
+  if (retval == 0) {
+    printf("error while reading segment file2\n");
+    return -1;
+  }
+  int read_key;
+  retval = fread(&read_key, size_k, 1, segment_p);
+  if (retval == 0) {
+    printf("error while reading segment file3\n");
+    return -1;
+  }
+  // compare read key with supplied key
+  retval = fread(value, size_v, 1, segment_p);
+  if (retval == 0) {
+    printf("error while reading segment file4\n");
+    return -1;
+  }
+  return 0;
+}
+
 ExecuteResult execute_command(Command* command, Node** hashmap) {
   off_t offset;
   switch (command->type) {
@@ -312,42 +349,12 @@ ExecuteResult execute_command(Command* command, Node** hashmap) {
         printf("segment file not found upon GET.\n");
         return EXECUTE_ERROR;
       }
-      // [Refactor below, reading from file]
-      // Reading value directly from file here.
-      // May need to read the size of the value, and then the value.
-      // Actually, need to read the key as well, to compare with the input
-      // and for that, need the size of the key as well.
-      int retval;
-      retval = fseek(segment_p, offset, SEEK_SET);
-      if (retval != 0) {
-        printf("error while seeking segment file\n.");
-      }
-      size_t size_k = 0;
-      retval = fread(&size_k, sizeof(int), 1, segment_p);
-      if (retval == 0) {
-        printf("error while reading segment file1\n");
-        return 0;
-      }
-      size_t size_v = 0;
-      retval = fread(&size_v, sizeof(VALUE_NUM_BYTES), 1, segment_p);
-      if (retval == 0) {
-        printf("error while reading segment file2\n");
-        return 0;
-      }
-      int read_key;
-      retval = fread(&read_key, size_k, 1, segment_p);
-      if (retval == 0) {
-        printf("error while reading segment file3\n");
-        return 0;
-      }
-      // compare read key with supplied key
       char value[VALUE_NUM_BYTES] = {0};
-      retval = fread(value, size_v, 1, segment_p);
-      if (retval == 0) {
-        printf("error while reading segment file4\n");
-        return 0;
+      int retval = get_value_from_segment(segment_p, offset, value);
+      if (retval == -1) {
+        /* error printed in callee */
+        return EXECUTE_ERROR;
       }
-      
       printf("retrieved: %s\n", value);
       return EXECUTE_SUCCESS;
     default:

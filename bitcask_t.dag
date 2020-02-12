@@ -53,7 +53,7 @@
 
 (Fragment segment files
  
- (Close and store old file
+ (* Close and store old file
   when full)
  
  (Create new segment file)

@@ -135,3 +135,13 @@ Who would be really good. I don't trust random redditors/internet people.
 
 Is return -1 in main() equiv. to exit(EXIT_FAILURE) ?
 same for return 0 and exit(EXIT_SUCCESS)
+
+
+
+size_t is unsigned and therefore cannot (return -1 in order to) indicate an error.
+ssize_t is a signed version of this.
+
+
+
+Next, learn how to read the disassembled output.
+elf files? x86 assembly? linkers?
