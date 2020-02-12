@@ -72,9 +72,6 @@ Node* get_bucket(Node** hashmap, int key) {
   //printf("hash: %d\n", h);
   Node* bucket_node = hashmap[h];
   
-  // is this right? what if the bucket's key doesn't match but next
-  // node is null?
-  // it's ok, think we check in insert_hashmap
   while ((bucket_node->next_node != NULL) &&
       (bucket_node->key != key)) {
     bucket_node = bucket_node->next_node;
@@ -91,7 +88,6 @@ void insert_hashmap(Node** hashmap, int key, off_t offset) {
     /* Do we need these two lines of code here? */
     bucket_node->key = key;
     bucket_node->offset = offset;
-    //printf("bucket[key=%d, offset=%d]\n", key, offset);
     return;
   }
   
@@ -107,7 +103,6 @@ void insert_hashmap(Node** hashmap, int key, off_t offset) {
   bucket_node->key = key;
   bucket_node->offset = offset;
   bucket_node->next_node = (Node*)malloc(sizeof(Node));
-  //printf("bucket[key=%d, offset=%d]\n", key, offset);
 }
  
 off_t get_from_hashmap(Node** hashmap, int key) {
