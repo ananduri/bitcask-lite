@@ -46,14 +46,31 @@
 
 
  
-
+ (Use tombstone values to indicate deletion)
 
 
  
 
 (Fragment segment files
  
- (* Close and store old file
+ (* Include file ID in the hashmap ("keydir") as well
+ 
+   (? How to generate/keep track of these file IDs)
+   (? How to know what file ID to use when generating a new file
+   
+     (- fold max_id over files in current dir)
+     
+     (- write current max ID to a file)
+     
+     (- randomly generate IDs, check for collisions before creating a file)
+     
+     (- use timestamp as file ID)
+     
+     (+ going with writing current max ID to a file)))
+   
+ (~ Include the value size in the keydir as well)
+
+ (Close and store old file
   when full)
  
  (Create new segment file)

@@ -157,3 +157,13 @@ if size_t is 8 bytes (verify), then as soon as it goes over 2^(31) it should get
 
 do i expect any files to be of size 2^31? other way around, that is an upper bound for the segment file size.
 this is ~2GB (or exactly 2 GiB)
+
+
+what should the size limit on a segment file be?
+Let's make it 100 bytes for now, so we can easily test things.
+
+
+
+Going with writing current max ID to a file. Shouldn't be race conditions since
+only one thing at a time will be creating a new segmetn file. It is another point of failure,
+and more complexity, but seems nicer than having a linear scan take place, or using timestamps.
