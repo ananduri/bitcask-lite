@@ -430,8 +430,10 @@ int main(int argc, char* argv[]) {
     printf("error while opening segment ID file\n");
     return -1;
   }
+  bool created_segment_id_file = false;
   if (ftell(idfile_p) == 0) {
     segment_id = 0;
+    created_segment_id_file = true;
   } else {
     // seek to beginning (glibc does do this but not other impls)
     fseek(idfile_p, 0, SEEK_SET);
@@ -460,6 +462,9 @@ int main(int argc, char* argv[]) {
     if (retval != 0) {
       return -1;
     }
+  }
+  if (created_segment_id_file) {
+    putw(segment_id, idfile_p);
   }
   
   Command command = {0};

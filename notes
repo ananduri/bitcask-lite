@@ -191,5 +191,6 @@ When do we write to the segment_id file?
 
 
 Need to do a bunch of that bookkeeping work--update segment id file when closing a segment,
+Also store the segment file ID inside the keydir (hashmap).
 
 
