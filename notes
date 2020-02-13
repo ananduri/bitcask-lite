@@ -167,3 +167,29 @@ Let's make it 100 bytes for now, so we can easily test things.
 Going with writing current max ID to a file. Shouldn't be race conditions since
 only one thing at a time will be creating a new segmetn file. It is another point of failure,
 and more complexity, but seems nicer than having a linear scan take place, or using timestamps.
+
+
+Can you write to a file atomically with fopen?
+We don't want to create it atomically, we want to /write/ to it atomically
+
+
+1. Do you need a terminal null when supplying a string pathname to fopen? 
+-> almost certainly
+
+2. Does sprintf add a terminal byte? 
+-> looks like it does https://github.com/torvalds/linux/blob/v5.4/arch/alpha/boot/stdio.c#L289
+   actually, that's not added to the buf... but the str pointer is pointing to buf, and it is modified, so ok
+
+3. What happens if the buffer you gave to sprintf is too big?
+-> should be okay, as the null byte is appended.
+
+
+What is this errno thing?
+
+
+When do we write to the segment_id file?
+
+
+Need to do a bunch of that bookkeeping work--update segment id file when closing a segment,
+
+

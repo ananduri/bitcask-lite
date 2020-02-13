@@ -419,15 +419,44 @@ int load_segment_into_memory(FILE* segment_p, Node** hashmap) {
 
 int main(int argc, char* argv[]) {
   Node** hashmap = create_hashmap();
+  int retval;
 
-  // read max segment ID from ID file; if doesn't exist, create it
+  // read max segment ID from ID file
+  FILE* idfile_p;
+  int segment_id;
+  idfile_p = fopen("last_used_id", "a+");
+  // what if file doesn't exist--have to use a+ ?
+  if (idfile_p == NULL) {
+    printf("error while opening segment ID file\n");
+    return -1;
+  }
+  if (ftell(idfile_p) == 0) {
+    segment_id = 0;
+  } else {
+    // seek to beginning (glibc does do this but not other impls)
+    fseek(idfile_p, 0, SEEK_SET);
+    retval = fread(&segment_id, sizeof(int), 1, idfile_p);
+    if (retval != 0) {
+      printf("error while reading ID file\n");
+      return -1;
+    }
+  }
+  
+  char[10] segment_file_name;
+  retval = sprintf(segment_file_name, "segment%d", segment_id);
+  if (retval < 0) {
+    printf("error while calling sprintf\n");
+    return -1;
+  }
+  printf("segment file name: %s\n", segment_file_name);  // debug statement
 
   // check if a segment file exists on disk,
   // and if so, load that data into the in-memory hashmap.
   FILE* segment_p;
-  segment_p = fopen("segment0", "r");
+  //segment_p = fopen("segment0", "r");
+  segment_p = fopen(segment_file_name, "r");
   if (segment_p != NULL) {
-    int retval = load_segment_into_memory(segment_p, hashmap);
+    retval = load_segment_into_memory(segment_p, hashmap);
     if (retval != 0) {
       return -1;
     }
