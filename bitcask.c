@@ -457,13 +457,16 @@ int main(int argc, char* argv[]) {
   FILE* segment_p;
   //segment_p = fopen("segment0", "r");
   segment_p = fopen(segment_file_name, "r");
-  if (segment_p != NULL) {
-    retval = load_segment_into_memory(segment_p, hashmap);
-    if (retval != 0) {
-      return -1;
-    }
+  if (segment_p == NULL) {
+    printf("error while opening segment file\n");
+    return -1;
+  }
+  retval = load_segment_into_memory(segment_p, hashmap);
+  if (retval != 0) {
+    return -1;
   }
   if (created_segment_id_file) {
+    // will segment_id always be 0 if the segment id file is just created?
     putw(segment_id, idfile_p);
   }
   
